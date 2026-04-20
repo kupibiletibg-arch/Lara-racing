@@ -1,0 +1,86 @@
+{
+  "nav": {
+    "home": "Home",
+    "calendar": "Calendar",
+    "track": "Track",
+    "facilities": "Facilities",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "hero": {
+    "kicker": "BULGARIA'S FIA GRADE 3 CIRCUIT",
+    "title": "A1 Motor Park",
+    "subtitle": "3.91 km · 15 turns · 25 pit boxes · 585 m altitude",
+    "intro": "Bulgaria's first FIA-homologated circuit, opened 21 March 2026 in Samokov.",
+    "ctaCalendar": "See the calendar",
+    "ctaTrack": "Explore the track"
+  },
+  "track": {
+    "title": "The Track",
+    "heading": "Follow the line",
+    "lengthLabel": "Length",
+    "widthLabel": "Width",
+    "turnsLabel": "Turns",
+    "pitboxesLabel": "Pit boxes",
+    "altitudeLabel": "Altitude",
+    "directionLabel": "Direction",
+    "direction": "Counter-clockwise",
+    "turns": "15",
+    "elevationHeading": "Elevation profile",
+    "elevationCaption": "Rila foothills, near Samokov."
+  },
+  "calendar": {
+    "title": "2026 Season",
+    "subtitle": "Scroll the track. Every corner is an event.",
+    "sessionsLabel": "Sessions",
+    "statusTBD": "Dates TBD",
+    "tickets": "Tickets soon",
+    "info": "Details",
+    "moreInfo": "See all events"
+  },
+  "facilities": {
+    "title": "Facilities",
+    "subtitle": "14 points of interest, from the main gate to the paddock.",
+    "legendHeading": "Legend"
+  },
+  "about": {
+    "title": "About A1 Motor Park",
+    "body": "A1 Motor Park is the first fully FIA-homologated circuit on the Balkan Peninsula. Set at the foot of the Rila mountains near Samokov, 3.91 km long with 15 turns, it is the new home of Bulgarian motorsport."
+  },
+  "contact": {
+    "title": "Contact",
+    "body": "Reach us for information, partnerships, or track rentals.",
+    "addressLabel": "Address",
+    "address": "Samokov, Bulgaria",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone"
+  },
+  "footer": {
+    "tagline": "Bulgaria's first FIA Grade 3 circuit.",
+    "copyright": "© 2026 A1 Motor Park",
+    "ticketing": "Ticketing by"
+  },
+  "events": {
+    "opening": "Official opening",
+    "openDays": "Open days",
+    "endurance": "Bulgarian Endurance Series 999 — Round 1",
+    "bmw1": "BMW Cup 2026 — Round 1",
+    "gs": "GS Motodays",
+    "sr": "SR Track Days",
+    "bmw2": "BMW Cup 2026 — Round 2",
+    "alpeadria": "Alpe Adria International — Finale"
+  },
+  "eventType": {
+    "ceremony": "Ceremony",
+    "public": "Public",
+    "cars": "Cars",
+    "moto": "Motorcycles",
+    "endurance": "Endurance"
+  },
+  "common": {
+    "languageLabel": "Language",
+    "switchTo": "Български",
+    "loading": "Loading…",
+    "backToTop": "Back to top"
+  }
+}

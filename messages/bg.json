@@ -1,0 +1,86 @@
+{
+  "nav": {
+    "home": "Начало",
+    "calendar": "Календар",
+    "track": "Пистата",
+    "facilities": "Съоръжения",
+    "about": "За нас",
+    "contact": "Контакт"
+  },
+  "hero": {
+    "kicker": "БЪЛГАРСКА FIA GRADE 3 ПИСТА",
+    "title": "A1 Motor Park",
+    "subtitle": "3,91 км · 15 завоя · 25 бокса · 585 м надморска височина",
+    "intro": "Първата хомологирана от FIA писта в България, открита на 21 март 2026 г. край Самоков.",
+    "ctaCalendar": "Виж календара",
+    "ctaTrack": "Виж пистата"
+  },
+  "track": {
+    "title": "Пистата",
+    "heading": "Проследи линията",
+    "lengthLabel": "Дължина",
+    "widthLabel": "Ширина",
+    "turnsLabel": "Завои",
+    "pitboxesLabel": "Боксове",
+    "altitudeLabel": "Надморска височина",
+    "directionLabel": "Посока",
+    "direction": "Обратно на часовниковата",
+    "turns": "15",
+    "elevationHeading": "Профил на надморската височина",
+    "elevationCaption": "Местността край Самоков, в подножието на Рила."
+  },
+  "calendar": {
+    "title": "Сезон 2026",
+    "subtitle": "Прелистни по пистата. Всеки завой е събитие.",
+    "sessionsLabel": "Сесии",
+    "statusTBD": "Датите се уточняват",
+    "tickets": "Билети скоро",
+    "info": "Подробности",
+    "moreInfo": "Виж всички събития"
+  },
+  "facilities": {
+    "title": "Съоръжения",
+    "subtitle": "14 точки на интерес, от главния вход до пистовия падок.",
+    "legendHeading": "Легенда"
+  },
+  "about": {
+    "title": "За A1 Motor Park",
+    "body": "A1 Motor Park е първата напълно хомологирана от FIA писта на Балканския полуостров. Разположена в подножието на Рила планина край Самоков, с дължина 3,91 км и 15 завоя, тя е новият дом на българския моторен спорт."
+  },
+  "contact": {
+    "title": "Контакт",
+    "body": "Пиши ни за информация, партньорства или рентове на писта.",
+    "addressLabel": "Адрес",
+    "address": "гр. Самоков, България",
+    "emailLabel": "Имейл",
+    "phoneLabel": "Телефон"
+  },
+  "footer": {
+    "tagline": "Първата FIA Grade 3 писта в България.",
+    "copyright": "© 2026 A1 Motor Park",
+    "ticketing": "Билети през"
+  },
+  "events": {
+    "opening": "Официално откриване",
+    "openDays": "Отворени дни",
+    "endurance": "Bulgarian Endurance Series 999 — Кръг 1",
+    "bmw1": "BMW Cup 2026 — Кръг 1",
+    "gs": "GS Motodays",
+    "sr": "SR Track Days",
+    "bmw2": "BMW Cup 2026 — Кръг 2",
+    "alpeadria": "Alpe Adria International — Финал"
+  },
+  "eventType": {
+    "ceremony": "Церемония",
+    "public": "Публично",
+    "cars": "Автомобили",
+    "moto": "Мотоциклети",
+    "endurance": "Издръжливост"
+  },
+  "common": {
+    "languageLabel": "Език",
+    "switchTo": "English",
+    "loading": "Зарежда…",
+    "backToTop": "Нагоре"
+  }
+}
