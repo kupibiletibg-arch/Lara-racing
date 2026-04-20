@@ -9,7 +9,6 @@ import clsx from 'clsx'
 
 export function Header() {
   const t = useTranslations('nav')
-  const tc = useTranslations('common')
   const locale = useLocale()
   const pathname = usePathname()
 
@@ -28,7 +27,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-bg/70 border-b rule">
-      <div className="mx-auto max-w-[1400px] px-5 md:px-8 h-16 flex items-center justify-between">
+      <div className="relative w-full px-2 md:px-3 h-24 md:h-28 flex items-center justify-between">
         <Link
           href={`/${locale}`}
           className="flex items-center hover:opacity-90 transition-opacity"
@@ -37,7 +36,7 @@ export function Header() {
           <Logo />
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1 text-[13px] font-mono tracking-mono uppercase">
+        <nav className="absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-1 text-[13px] font-mono tracking-mono uppercase">
           {links.slice(1).map(l => {
             const active = pathname === l.href || pathname.startsWith(`${l.href}/`)
             return (
@@ -61,9 +60,25 @@ export function Header() {
         <div className="flex items-center gap-3">
           <Link
             href={altHref}
-            className="font-mono tracking-mono uppercase text-[11px] text-ink/60 hover:text-ink transition-colors px-2 py-1 border rule"
+            aria-label={`Switch to ${altLocale.toUpperCase()}`}
+            className="inline-flex items-center gap-2 font-mono tracking-mono uppercase text-[14px] text-ink/60 hover:text-ink transition-colors px-2.5 py-1.5 border rule"
           >
-            {tc('switchTo')}
+            <svg
+              viewBox="0 0 24 24"
+              className="h-[18px] w-[18px]"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M3 12h18" />
+              <path d="M12 3a14 14 0 0 1 0 18" />
+              <path d="M12 3a14 14 0 0 0 0 18" />
+            </svg>
+            {altLocale.toUpperCase()}
           </Link>
         </div>
       </div>

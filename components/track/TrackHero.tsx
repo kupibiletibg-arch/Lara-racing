@@ -5,7 +5,6 @@ import { motion, useScroll, useSpring, useReducedMotion } from 'framer-motion'
 import { useTranslations, useLocale } from 'next-intl'
 import { ElevationStrip } from './ElevationStrip'
 import { RacePin } from './RacePin'
-import { StartLights } from './StartLights'
 import { races } from '@/lib/data/races'
 import { trackPath, pitPath, trackViewBox, trackMeta } from '@/lib/data/track'
 import { pointAt } from '@/lib/track/usePathPoint'
@@ -59,7 +58,7 @@ export function TrackHero() {
   // Wait until the LoadingScreen has faded out (≈2.3s) before starting the
   // start-lights sequence. Listens for a custom event dispatched by the loader.
   useEffect(() => {
-    const onReady = () => setPhase(p => (p === 'loading' ? 'lights' : p))
+    const onReady = () => setPhase(p => (p === 'loading' ? 'drawing' : p))
     window.addEventListener('a1-ready', onReady)
     // Fallback — if loader never fires (reduced motion, etc.), start after 2.4s.
     const fallback = window.setTimeout(onReady, 2400)
@@ -79,8 +78,6 @@ export function TrackHero() {
     if (!pathRef.current) return
     setTotalLength(pathRef.current.getTotalLength())
   }, [])
-
-  const handleGo = useCallback(() => setPhase('drawing'), [])
 
   useEffect(() => {
     if (phase !== 'drawing' || !totalLength) return
@@ -247,12 +244,6 @@ export function TrackHero() {
               <Crosshair className="top-0 right-0 rotate-90" />
               <Crosshair className="bottom-0 left-0 -rotate-90" />
               <Crosshair className="bottom-0 right-0 rotate-180" />
-
-              {phase === 'lights' && (
-                <div className="absolute left-1/2 top-4 -translate-x-1/2 z-20">
-                  <StartLights onGo={handleGo} skip={!!prefersReduced} />
-                </div>
-              )}
 
               <div className="absolute bottom-2 left-2 z-20 flex items-center gap-2">
                 <span className="telemetry !text-[10px]">
