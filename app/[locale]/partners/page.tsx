@@ -1,0 +1,35 @@
+import { setRequestLocale, getTranslations } from 'next-intl/server'
+import { partners } from '@/lib/data/partners'
+import { PartnerTile } from '@/components/partners/PartnerTile'
+
+export default async function PartnersPage({
+  params,
+}: {
+  params: { locale: string }
+}) {
+  setRequestLocale(params.locale)
+  const t = await getTranslations('partners')
+
+  return (
+    <section className="mx-auto max-w-[1200px] px-5 md:px-8 py-12 md:py-20">
+      <p className="telemetry mb-3">{t('kicker')}</p>
+      <h1 className="font-display font-bold text-[44px] md:text-[64px] leading-[0.95] tracking-tight">
+        {t('title')}
+      </h1>
+      <p className="mt-5 md:mt-6 max-w-2xl text-ink/80 text-[16px] md:text-[18px] leading-relaxed">
+        {t('intro')}
+      </p>
+
+      <ul className="mt-12 md:mt-16 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
+        {partners.map((p) => (
+          <li key={p.slug}>
+            <PartnerTile partner={p} size="md" />
+            <p className="mt-2 font-mono tracking-mono uppercase text-[10px] text-ink/55 truncate">
+              {p.name}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

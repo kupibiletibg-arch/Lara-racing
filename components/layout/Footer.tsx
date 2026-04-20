@@ -1,11 +1,19 @@
 import { useTranslations } from 'next-intl'
 import { Logo } from '@/components/brand/Logo'
+import { PartnersMarquee } from '@/components/partners/PartnersMarquee'
 
 export function Footer() {
   const t = useTranslations('footer')
 
   return (
     <footer className="relative mt-32 border-t rule">
+      <div className="pt-10 md:pt-14">
+        <p className="mx-auto max-w-[1400px] px-5 md:px-8 telemetry mb-4">
+          {t('partners')}
+        </p>
+        <PartnersMarquee />
+      </div>
+
       <div className="mx-auto max-w-[1400px] px-5 md:px-8 py-12 md:py-16 grid md:grid-cols-[auto_1fr_auto] gap-8 items-start">
         <Logo />
         <div className="max-w-md">

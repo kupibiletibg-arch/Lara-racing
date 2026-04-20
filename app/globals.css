@@ -72,6 +72,12 @@ body {
   border-color: rgba(242, 237, 228, 0.12);
 }
 
+/* Infinite partner carousel — duplicates the list; translates -50% over loop. */
+@keyframes marquee-a1 {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
 /* Reduced motion: kill all animations except scroll-linked position. */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -4,6 +4,7 @@
     "calendar": "Calendar",
     "track": "Track",
     "facilities": "Facilities",
+    "partners": "Partners",
     "about": "About",
     "contact": "Contact"
   },
@@ -58,7 +59,13 @@
   "footer": {
     "tagline": "Bulgaria's first FIA Grade 3 circuit.",
     "copyright": "© 2026 A1 Motor Park",
-    "ticketing": "Ticketing by"
+    "ticketing": "Ticketing by",
+    "partners": "Partners"
+  },
+  "partners": {
+    "kicker": "PARTNERS",
+    "title": "Partners & sponsors",
+    "intro": "The A1 Motor Park family — the teams, clubs and brands racing with us through 2026 and beyond. Click any logo to visit."
   },
   "events": {
     "opening": "Official opening",

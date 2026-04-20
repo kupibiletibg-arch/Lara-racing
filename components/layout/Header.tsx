@@ -21,6 +21,7 @@ export function Header() {
     { href: `/${locale}/calendar`, label: t('calendar') },
     { href: `/${locale}/track`, label: t('track') },
     { href: `/${locale}/facilities`, label: t('facilities') },
+    { href: `/${locale}/partners`, label: t('partners') },
     { href: `/${locale}/about`, label: t('about') },
     { href: `/${locale}/contact`, label: t('contact') },
   ]
