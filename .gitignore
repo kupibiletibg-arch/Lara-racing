@@ -33,3 +33,4 @@ yarn-error.log*
 # preview/tooling config — per-developer, not for the repo
 /.claude/
 /.vercel/
+.vercel
