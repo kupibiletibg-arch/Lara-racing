@@ -16,6 +16,13 @@ export type Partner = {
  */
 export const partners: readonly Partner[] = [
   {
+    slug: 'kupibileti',
+    name: 'kupibileti.bg',
+    url: 'https://www.kupibileti.bg/bg/about-event/2292',
+    logoSrc: '/partners/kupibileti.svg',
+    alt: 'kupibileti.bg — ticketing partner',
+  },
+  {
     slug: 'pulse',
     name: 'Pulse',
     url: '',
