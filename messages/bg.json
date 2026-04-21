@@ -77,6 +77,13 @@
     "bmw2": "BMW Cup 2026 — Кръг 2",
     "alpeadria": "Alpe Adria International — Финал"
   },
+  "upcomingEvents": {
+    "kicker": "ПРЕДСТОЯЩИ · 2026",
+    "title": "Предстоящи събития",
+    "subtitle": "Това, което идва към пистата скоро.",
+    "tickets": "Купи билет в kupibileti.bg",
+    "badge": "ПРЕДСТОЯЩО"
+  },
   "pastEvents": {
     "title": "Отминали събития",
     "subtitle": "Какво видя пистата през изминалите седмици.",

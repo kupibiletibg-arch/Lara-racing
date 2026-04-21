@@ -77,6 +77,13 @@
     "bmw2": "BMW Cup 2026 — Round 2",
     "alpeadria": "Alpe Adria International — Finale"
   },
+  "upcomingEvents": {
+    "kicker": "UPCOMING · 2026",
+    "title": "Upcoming events",
+    "subtitle": "What's headed to the track next.",
+    "tickets": "Buy tickets on kupibileti.bg",
+    "badge": "UPCOMING"
+  },
   "pastEvents": {
     "title": "Past events",
     "subtitle": "What the track has already seen this season.",

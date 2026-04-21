@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { TrackHero } from '@/components/track/TrackHero'
 import { RaceCard } from '@/components/calendar/RaceCard'
 import { PastEvents } from '@/components/calendar/PastEvents'
+import { UpcomingEvents } from '@/components/calendar/UpcomingEvents'
 import { FacilityMap } from '@/components/facilities/FacilityMap'
 import { races } from '@/lib/data/races'
 import { trackMeta } from '@/lib/data/track'
@@ -43,6 +44,8 @@ export default async function Home({ params }: { params: { locale: string } }) {
           ))}
         </div>
       </section>
+
+      <UpcomingEvents />
 
       <PastEvents />
 
