@@ -47,6 +47,7 @@ export function Header() {
   }, [menuOpen])
 
   return (
+    <>
     <header className="sticky top-0 z-40 backdrop-blur-md bg-bg/70 border-b rule">
       <div className="relative w-full px-2 md:px-3 h-24 md:h-28 flex items-center justify-between">
         <Link
@@ -132,43 +133,46 @@ export function Header() {
           </button>
         </div>
       </div>
-
-      {/* Mobile nav overlay */}
-      <div
-        id="mobile-nav"
-        className={clsx(
-          'lg:hidden fixed inset-0 top-24 z-30 transition-opacity duration-200',
-          menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
-        )}
-        style={{
-          backgroundColor: 'rgba(5, 5, 5, 0.55)',
-          backdropFilter: 'blur(28px) saturate(1.6)',
-          WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
-        }}
-        aria-hidden={!menuOpen}
-      >
-        <nav className="flex flex-col gap-1 px-5 py-8">
-          {links.map(l => {
-            const active =
-              l.exact
-                ? pathname === l.href
-                : pathname === l.href || pathname.startsWith(`${l.href}/`)
-            return (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={() => setMenuOpen(false)}
-                className={clsx(
-                  'font-display font-medium text-[22px] py-3 px-1 border-b rule transition-colors',
-                  active ? 'text-brand' : 'text-ink/85 hover:text-ink',
-                )}
-              >
-                {l.label}
-              </Link>
-            )
-          })}
-        </nav>
-      </div>
     </header>
+
+    {/* Mobile nav overlay — rendered OUTSIDE <header> so its fixed positioning
+        is relative to the viewport (header's backdrop-filter would otherwise
+        create a containing block that clips this layer). */}
+    <div
+      id="mobile-nav"
+      className={clsx(
+        'lg:hidden fixed inset-x-0 bottom-0 top-24 z-30 transition-opacity duration-200',
+        menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
+      )}
+      style={{
+        backgroundColor: 'rgba(5, 5, 5, 0.55)',
+        backdropFilter: 'blur(28px) saturate(1.6)',
+        WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
+      }}
+      aria-hidden={!menuOpen}
+    >
+      <nav className="flex flex-col gap-1 px-5 py-8">
+        {links.map(l => {
+          const active =
+            l.exact
+              ? pathname === l.href
+              : pathname === l.href || pathname.startsWith(`${l.href}/`)
+          return (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setMenuOpen(false)}
+              className={clsx(
+                'font-display font-medium text-[22px] py-3 px-1 border-b rule transition-colors',
+                active ? 'text-brand' : 'text-ink/85 hover:text-ink',
+              )}
+            >
+              {l.label}
+            </Link>
+          )
+        })}
+      </nav>
+    </div>
+    </>
   )
 }
