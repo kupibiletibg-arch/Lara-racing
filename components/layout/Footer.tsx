@@ -7,16 +7,13 @@ export function Footer() {
 
   return (
     <footer className="relative mt-32 border-t rule">
-      <div className="pt-10 md:pt-14">
-        <p className="mx-auto max-w-[1400px] px-5 md:px-8 telemetry mb-4">
-          {t('partners')}
-        </p>
+      <div className="pt-8 md:pt-12">
         <PartnersMarquee />
       </div>
 
-      <div className="mx-auto max-w-[1400px] px-5 md:px-8 py-12 md:py-16 grid md:grid-cols-[auto_1fr_auto] gap-8 items-start">
+      <div className="w-full px-3 md:px-4 py-12 md:py-16 flex items-start justify-between gap-6">
         <Logo />
-        <div className="max-w-md">
+        <div className="max-w-md text-center hidden md:block">
           <p className="text-ink/80 font-display text-lg leading-snug">{t('tagline')}</p>
           <p className="mt-4 font-mono tracking-mono uppercase text-[11px] text-ink/50">
             Samokov · Bulgaria · 42°19′N 23°34′E · 585 m
@@ -28,7 +25,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t rule">
-        <div className="mx-auto max-w-[1400px] px-5 md:px-8 py-4 font-mono tracking-mono uppercase text-[10px] text-ink/40">
+        <div className="w-full px-3 md:px-4 py-4 font-mono tracking-mono uppercase text-[10px] text-ink/40">
           {t('copyright')}
         </div>
       </div>

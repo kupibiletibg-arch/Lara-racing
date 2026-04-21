@@ -9,11 +9,8 @@ import { PartnerTile } from './PartnerTile'
 export function PartnersMarquee() {
   const loop = [...partners, ...partners]
   return (
-    <div
-      aria-hidden
-      className="relative overflow-hidden border-y rule bg-ink/[0.02] py-5"
-    >
-      <div className="flex gap-5 animate-[marquee-a1_40s_linear_infinite] w-max">
+    <div aria-hidden className="relative overflow-hidden py-6 md:py-8">
+      <div className="flex gap-10 md:gap-14 items-center animate-[marquee-a1_40s_linear_infinite] w-max">
         {loop.map((p, i) => (
           <div key={`${p.slug}-${i}`} className="shrink-0">
             <PartnerTile partner={p} size="sm" />
