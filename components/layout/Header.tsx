@@ -137,9 +137,14 @@ export function Header() {
       <div
         id="mobile-nav"
         className={clsx(
-          'lg:hidden fixed inset-0 top-24 z-30 bg-bg/40 backdrop-blur-2xl backdrop-saturate-150 transition-opacity duration-200',
+          'lg:hidden fixed inset-0 top-24 z-30 transition-opacity duration-200',
           menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
         )}
+        style={{
+          backgroundColor: 'rgba(5, 5, 5, 0.55)',
+          backdropFilter: 'blur(28px) saturate(1.6)',
+          WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
+        }}
         aria-hidden={!menuOpen}
       >
         <nav className="flex flex-col gap-1 px-5 py-8">
