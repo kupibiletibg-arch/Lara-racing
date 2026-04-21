@@ -79,15 +79,15 @@ export function Header() {
           })}
         </nav>
 
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex items-center gap-1.5 md:gap-3">
           <a
             href="https://www.instagram.com/a1.motor.park/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className="inline-flex items-center justify-center w-9 h-9 text-ink/70 hover:text-ink transition-colors"
+            className="inline-flex items-center justify-center w-8 h-8 md:w-9 md:h-9 text-ink/70 hover:text-ink transition-colors"
           >
-            <svg viewBox="0 0 24 24" className="h-[20px] w-[20px]" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] md:h-[20px] md:w-[20px]" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <rect x="3" y="3" width="18" height="18" rx="5" />
               <circle cx="12" cy="12" r="4" />
               <circle cx="17.5" cy="6.5" r="0.9" fill="currentColor" stroke="none" />
@@ -98,9 +98,9 @@ export function Header() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
-            className="inline-flex items-center justify-center w-9 h-9 text-ink/70 hover:text-ink transition-colors"
+            className="inline-flex items-center justify-center w-8 h-8 md:w-9 md:h-9 text-ink/70 hover:text-ink transition-colors"
           >
-            <svg viewBox="0 0 24 24" className="h-[20px] w-[20px]" fill="currentColor" aria-hidden>
+            <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] md:h-[20px] md:w-[20px]" fill="currentColor" aria-hidden>
               <path d="M13.5 21.95V13.5h2.83l.42-3.3h-3.25V8.1c0-.95.27-1.6 1.63-1.6h1.74V3.57a23.4 23.4 0 0 0-2.54-.13c-2.52 0-4.25 1.54-4.25 4.37v2.4H7.25v3.3h2.83v8.45z" />
             </svg>
           </a>
