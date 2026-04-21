@@ -85,9 +85,11 @@
     "badge": "UPCOMING"
   },
   "pastEvents": {
+    "kicker": "ARCHIVE · 2026",
     "title": "Past events",
     "subtitle": "What the track has already seen this season.",
-    "tickets": "View on kupibileti.bg"
+    "tickets": "View on kupibileti.bg",
+    "badge": "PAST"
   },
   "eventType": {
     "ceremony": "Ceremony",

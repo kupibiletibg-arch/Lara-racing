@@ -3,8 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import { TrackHero } from '@/components/track/TrackHero'
 import { RaceCard } from '@/components/calendar/RaceCard'
-import { PastEvents } from '@/components/calendar/PastEvents'
-import { UpcomingEvents } from '@/components/calendar/UpcomingEvents'
+import { EventsShowcase } from '@/components/calendar/EventsShowcase'
 import { FacilityMap } from '@/components/facilities/FacilityMap'
 import { races } from '@/lib/data/races'
 import { trackMeta } from '@/lib/data/track'
@@ -45,9 +44,7 @@ export default async function Home({ params }: { params: { locale: string } }) {
         </div>
       </section>
 
-      <UpcomingEvents />
-
-      <PastEvents />
+      <EventsShowcase />
 
       <section className="mx-auto max-w-[1400px] px-5 md:px-8 py-16 md:py-24 border-t rule">
         <div className="grid md:grid-cols-[1fr_1.2fr] gap-8 md:gap-14 items-center">

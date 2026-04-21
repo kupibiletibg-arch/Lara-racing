@@ -85,9 +85,11 @@
     "badge": "ПРЕДСТОЯЩО"
   },
   "pastEvents": {
+    "kicker": "АРХИВ · 2026",
     "title": "Отминали събития",
     "subtitle": "Какво видя пистата през изминалите седмици.",
-    "tickets": "Виж в kupibileti.bg"
+    "tickets": "Виж в kupibileti.bg",
+    "badge": "ОТМИНАЛО"
   },
   "eventType": {
     "ceremony": "Церемония",
