@@ -137,7 +137,7 @@ export function Header() {
       <div
         id="mobile-nav"
         className={clsx(
-          'lg:hidden fixed inset-0 top-24 z-30 bg-bg/70 backdrop-blur-md transition-opacity duration-200',
+          'lg:hidden fixed inset-0 top-24 z-30 bg-bg/40 backdrop-blur-2xl backdrop-saturate-150 transition-opacity duration-200',
           menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
         )}
         aria-hidden={!menuOpen}
