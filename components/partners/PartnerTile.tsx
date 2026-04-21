@@ -14,7 +14,7 @@ type PartnerTileProps = {
 export function PartnerTile({ partner, size = 'md' }: PartnerTileProps) {
   const tileClasses =
     size === 'sm'
-      ? 'h-14 w-36 md:h-16 md:w-44'
+      ? 'h-16 w-40 md:h-16 md:w-44'
       : 'h-36 w-full md:h-40'
 
   const content = (

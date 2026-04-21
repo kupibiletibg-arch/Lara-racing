@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
@@ -11,6 +12,7 @@ export function Header() {
   const t = useTranslations('nav')
   const locale = useLocale()
   const pathname = usePathname()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const altLocale = locales.find(l => l !== locale) ?? 'en'
   const pathnameWithoutLocale = pathname.replace(new RegExp(`^/${locale}`), '') || '/'
@@ -25,6 +27,24 @@ export function Header() {
     { href: `/${locale}/about`, label: t('about') },
     { href: `/${locale}/contact`, label: t('contact') },
   ]
+
+  // Close on route change + lock page scroll while open + ESC to close.
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [menuOpen])
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-bg/70 border-b rule">
@@ -81,7 +101,68 @@ export function Header() {
             </svg>
             {altLocale.toUpperCase()}
           </Link>
+
+          {/* Hamburger — visible below lg, toggles the mobile menu overlay */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav"
+            className="lg:hidden inline-flex flex-col justify-center items-center gap-1.5 w-11 h-11 border rule text-ink/80 hover:text-ink"
+          >
+            <span
+              className={clsx(
+                'block h-[2px] w-5 bg-current transition-transform',
+                menuOpen && 'translate-y-[7px] rotate-45',
+              )}
+            />
+            <span
+              className={clsx(
+                'block h-[2px] w-5 bg-current transition-opacity',
+                menuOpen && 'opacity-0',
+              )}
+            />
+            <span
+              className={clsx(
+                'block h-[2px] w-5 bg-current transition-transform',
+                menuOpen && '-translate-y-[7px] -rotate-45',
+              )}
+            />
+          </button>
         </div>
+      </div>
+
+      {/* Mobile nav overlay */}
+      <div
+        id="mobile-nav"
+        className={clsx(
+          'lg:hidden fixed inset-0 top-24 z-30 bg-bg/95 backdrop-blur-md transition-opacity duration-200',
+          menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
+        )}
+        aria-hidden={!menuOpen}
+      >
+        <nav className="flex flex-col gap-1 px-5 py-8">
+          {links.map(l => {
+            const active =
+              l.exact
+                ? pathname === l.href
+                : pathname === l.href || pathname.startsWith(`${l.href}/`)
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setMenuOpen(false)}
+                className={clsx(
+                  'font-display font-medium text-[22px] py-3 px-1 border-b rule transition-colors',
+                  active ? 'text-brand' : 'text-ink/85 hover:text-ink',
+                )}
+              >
+                {l.label}
+              </Link>
+            )
+          })}
+        </nav>
       </div>
     </header>
   )
