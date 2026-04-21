@@ -24,9 +24,6 @@ export default async function PartnersPage({
         {partners.map((p) => (
           <li key={p.slug}>
             <PartnerTile partner={p} size="md" />
-            <p className="mt-2 font-mono tracking-mono uppercase text-[10px] text-ink/55 truncate">
-              {p.name}
-            </p>
           </li>
         ))}
       </ul>
