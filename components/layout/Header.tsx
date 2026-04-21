@@ -88,51 +88,48 @@ export function Header() {
           <Logo />
         </Link>
 
-        {/* Desktop nav + social icons stacked, absolutely centered */}
-        <div className="absolute left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-1.5">
-          <nav className="flex items-center gap-1 text-[13px] font-mono tracking-mono uppercase">
-            {links.slice(1).map(l => {
-              const active = pathname === l.href || pathname.startsWith(`${l.href}/`)
-              return (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className={clsx(
-                    'px-3 py-2 transition-colors relative',
-                    active ? 'text-brand' : 'text-ink/70 hover:text-ink',
-                  )}
-                >
-                  {l.label}
-                  {active && (
-                    <span className="absolute left-3 right-3 bottom-1 h-px bg-brand" />
-                  )}
-                </Link>
-              )
-            })}
-          </nav>
-          <div className="flex items-center gap-4">
-            <a
-              href={IG_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className="inline-flex items-center justify-center w-7 h-7 text-ink/60 hover:text-ink transition-colors"
-            >
-              <InstagramIcon className="h-[16px] w-[16px]" />
-            </a>
-            <a
-              href={FB_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook"
-              className="inline-flex items-center justify-center w-7 h-7 text-ink/60 hover:text-ink transition-colors"
-            >
-              <FacebookIcon className="h-[16px] w-[16px]" />
-            </a>
-          </div>
-        </div>
+        <nav className="absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-1 text-[13px] font-mono tracking-mono uppercase">
+          {links.slice(1).map(l => {
+            const active = pathname === l.href || pathname.startsWith(`${l.href}/`)
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={clsx(
+                  'px-3 py-2 transition-colors relative',
+                  active ? 'text-brand' : 'text-ink/70 hover:text-ink',
+                )}
+              >
+                {l.label}
+                {active && (
+                  <span className="absolute left-3 right-3 bottom-1 h-px bg-brand" />
+                )}
+              </Link>
+            )
+          })}
+        </nav>
 
         <div className="flex items-center gap-1.5 md:gap-3">
+          {/* Desktop-only social icons sitting to the left of the EN/BG switch */}
+          <a
+            href={IG_HREF}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            className="hidden lg:inline-flex items-center justify-center w-8 h-8 text-ink/60 hover:text-ink transition-colors"
+          >
+            <InstagramIcon className="h-[18px] w-[18px]" />
+          </a>
+          <a
+            href={FB_HREF}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            className="hidden lg:inline-flex items-center justify-center w-8 h-8 text-ink/60 hover:text-ink transition-colors"
+          >
+            <FacebookIcon className="h-[18px] w-[18px]" />
+          </a>
+
           <Link
             href={altHref}
             aria-label={`Switch to ${altLocale.toUpperCase()}`}
