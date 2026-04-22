@@ -17,6 +17,10 @@ export type InstagramPost = {
 }
 
 export const instagramPosts: InstagramPost[] = [
-  // TODO: replace with real permalinks from @a1.motor.park
-  { permalink: 'https://www.instagram.com/a1.motor.park/', caption: 'A1 Motor Park' },
+  { permalink: 'https://www.instagram.com/p/DXUCC08jaXG/' },
+  { permalink: 'https://www.instagram.com/reel/DWlju3GDaJw/' },
+  { permalink: 'https://www.instagram.com/reel/DXbTzALNMyx/' },
+  { permalink: 'https://www.instagram.com/reel/DXYq_57NyT1/' },
+  { permalink: 'https://www.instagram.com/reel/DXW7lG4Nl6N/' },
+  { permalink: 'https://www.instagram.com/reel/DXWuspSiILJ/' },
 ]
