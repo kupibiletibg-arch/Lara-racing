@@ -32,12 +32,24 @@
   },
   "calendar": {
     "title": "2026 Season",
-    "subtitle": "Scroll the track. Every corner is an event.",
+    "subtitle": "Every event on the track — filter by category, month, or whether it's already happened.",
     "sessionsLabel": "Sessions",
     "statusTBD": "Dates TBD",
     "tickets": "Tickets soon",
     "info": "Details",
-    "moreInfo": "See all events"
+    "moreInfo": "See all events",
+    "detailsCta": "Details",
+    "buyCta": "Buy tickets",
+    "empty": "No events match. Try a different filter.",
+    "filters": {
+      "category": "Category",
+      "when": "When",
+      "month": "Month",
+      "all": "All",
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "reset": "Clear filters"
+    }
   },
   "facilities": {
     "title": "Facilities",
@@ -96,7 +108,9 @@
     "public": "Public",
     "cars": "Cars",
     "moto": "Motorcycles",
-    "endurance": "Endurance"
+    "endurance": "Endurance",
+    "rally": "Rally",
+    "supercars": "Supercars"
   },
   "common": {
     "languageLabel": "Language",
