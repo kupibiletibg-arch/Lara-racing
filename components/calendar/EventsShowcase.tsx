@@ -135,8 +135,8 @@ function Carousel({
       : 'bg-ink text-bg'
 
   return (
-    <div className="flex flex-col">
-      <header className="mb-2 md:mb-4 min-h-[60px] md:min-h-[128px] flex flex-col justify-end">
+    <div className="grid grid-rows-subgrid row-span-2 gap-2 md:gap-4">
+      <header className="flex flex-col justify-end">
         <p className="telemetry mb-1 !text-[9px] md:!text-[11px]">{kicker}</p>
         <h2 className="font-display font-bold text-[18px] md:text-[32px] leading-tight tracking-tight">
           {heading}
@@ -245,7 +245,7 @@ export function EventsShowcase() {
 
   return (
     <section className="mx-auto max-w-[1400px] px-3 md:px-8 py-8 md:py-24 border-t rule">
-      <div className="grid grid-cols-2 gap-3 md:gap-10">
+      <div className="grid grid-cols-2 grid-rows-[auto_auto] gap-x-3 md:gap-x-10 gap-y-0">
         <Carousel
           items={upcomingEvents}
           kicker={tu('kicker')}
