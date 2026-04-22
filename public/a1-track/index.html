@@ -294,12 +294,11 @@ function resize() {
 
   // The track auto-rotates around Y, so its screen-space footprint isn't
   // the static path rectangle — it's the path's diagonal-length bounding
-  // circle. The path is 732 wide × 300 deep, diagonal ≈ 791, so worst-
-  // case horizontal extent grows ~8 % over the static 0° framing. Combined
-  // with the ribbon thickness the safe margin is ~15 %. Pull the camera
-  // back at least that much on every viewport; portrait viewports still
-  // take the larger DESIGN_ASPECT / aspect pullback when it's bigger.
-  const ROTATION_MARGIN = 1.15;
+  // circle plus the ribbon thickness. Previous 1.15× pullback still
+  // clipped the far-right edge at the fattest rotation angle, so floor
+  // the pullback at 1.22× on every viewport. Portrait viewports still
+  // take the larger DESIGN_ASPECT / aspect when that's bigger.
+  const ROTATION_MARGIN = 1.22;
   const zoomOut = Math.max(ROTATION_MARGIN, DESIGN_ASPECT / aspect);
   const dir = BASE_CAM_POS.clone().sub(BASE_LOOK_AT);
   camera.position.copy(dir.multiplyScalar(zoomOut).add(BASE_LOOK_AT));
