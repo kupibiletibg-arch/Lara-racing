@@ -136,7 +136,7 @@ function Carousel({
 
   return (
     <div className="flex flex-col">
-      <header className="mb-2 md:mb-4">
+      <header className="mb-2 md:mb-4 min-h-[60px] md:min-h-[128px] flex flex-col justify-end">
         <p className="telemetry mb-1 !text-[9px] md:!text-[11px]">{kicker}</p>
         <h2 className="font-display font-bold text-[18px] md:text-[32px] leading-tight tracking-tight">
           {heading}
