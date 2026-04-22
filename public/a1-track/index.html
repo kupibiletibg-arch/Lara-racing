@@ -105,14 +105,16 @@
     transition: opacity 0.3s;
   }
   .track-visualiser .marker.visible { opacity: 0.85; }
+  .track-visualiser .marker .num {
+    font-weight: 600; font-size: 9px;
+  }
   .track-visualiser .marker .tick {
     width: 1px;
     height: 14px;
-    background: linear-gradient(to top, rgba(255,255,255,0.55), rgba(255,255,255,0.15));
-    margin: 0 auto 2px;
-  }
-  .track-visualiser .marker .num {
-    font-weight: 600; font-size: 9px;
+    /* gradient fades toward the bottom so the tick visually hands off to
+       the ribbon it's pointing at */
+    background: linear-gradient(to bottom, rgba(255,255,255,0.55), rgba(255,255,255,0.15));
+    margin: 2px auto 0;
   }
 </style>
 </head>
@@ -279,7 +281,12 @@ function resize() {
   const targetVFov = 2 * Math.atan(Math.tan(targetHFov / 2) / aspect);
   camera.fov = (targetVFov * 180) / Math.PI;
 
-  const zoomOut = aspect < DESIGN_ASPECT ? DESIGN_ASPECT / aspect : 1;
+  // Always pull the camera back at least 1.2× so there's breathing room
+  // around the track on every viewport — fixes the slight horizontal clip
+  // on wide desktop stages where the design framing sat too close.
+  // Portrait viewports get an even larger pullback (DESIGN_ASPECT / aspect)
+  // to fit the full circuit without clipping the sides.
+  const zoomOut = Math.max(1.2, DESIGN_ASPECT / aspect);
   const dir = BASE_CAM_POS.clone().sub(BASE_LOOK_AT);
   camera.position.copy(dir.multiplyScalar(zoomOut).add(BASE_LOOK_AT));
   camera.lookAt(BASE_LOOK_AT);
@@ -559,7 +566,10 @@ const TURN_LABELS  = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '
 const markers = TURN_INDICES.map((idx, i) => {
   const el = document.createElement('div');
   el.className = 'marker';
-  el.innerHTML = `<div class="tick"></div><div class="num">${TURN_LABELS[i]}</div>`;
+  // num FIRST, tick SECOND — number sits on top, tick drops down from the
+  // number to the actual corner on the ribbon (marker is translated
+  // -100% Y, so its bottom edge sits at the corner).
+  el.innerHTML = `<div class="num">${TURN_LABELS[i]}</div><div class="tick"></div>`;
   markerContainer.appendChild(el);
 
   // Local position inside TRACK_GROUP — rotates/moves with the track
