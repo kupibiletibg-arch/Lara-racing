@@ -54,7 +54,7 @@ export function InstagramFeed() {
         </a>
       </div>
 
-      <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 items-start">
         {instagramPosts.map((p, i) => (
           <li
             key={`${p.permalink}-${i}`}
@@ -62,7 +62,6 @@ export function InstagramFeed() {
           >
             <blockquote
               className="instagram-media"
-              data-instgrm-captioned
               data-instgrm-permalink={p.permalink}
               data-instgrm-version="14"
               style={{ background: '#050505' }}
