@@ -21,7 +21,9 @@ export default async function Home({ params }: { params: { locale: string } }) {
     <>
       <TrackHero />
 
-      <section className="mx-auto max-w-[1400px] px-5 md:px-8 py-16 md:py-24">
+      <EventsShowcase />
+
+      <section className="mx-auto max-w-[1400px] px-5 md:px-8 py-16 md:py-24 border-t rule">
         <div className="flex items-end justify-between gap-6 mb-8 md:mb-12 flex-wrap">
           <div>
             <p className="telemetry mb-2">CALENDAR · 2026</p>
@@ -43,8 +45,6 @@ export default async function Home({ params }: { params: { locale: string } }) {
           ))}
         </div>
       </section>
-
-      <EventsShowcase />
 
       <section className="mx-auto max-w-[1400px] px-5 md:px-8 py-16 md:py-24 border-t rule">
         <div className="grid md:grid-cols-[1fr_1.2fr] gap-8 md:gap-14 items-center">
