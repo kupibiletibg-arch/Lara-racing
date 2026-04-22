@@ -136,12 +136,12 @@ function Carousel({
 
   return (
     <div className="flex flex-col">
-      <header className="mb-4">
-        <p className="telemetry mb-1">{kicker}</p>
-        <h2 className="font-display font-bold text-[26px] md:text-[32px] leading-tight tracking-tight">
+      <header className="mb-2 md:mb-4">
+        <p className="telemetry mb-1 !text-[9px] md:!text-[11px]">{kicker}</p>
+        <h2 className="font-display font-bold text-[18px] md:text-[32px] leading-tight tracking-tight">
           {heading}
         </h2>
-        <p className="mt-1 text-ink/70 text-[14px]">{subtitle}</p>
+        <p className="mt-1 text-ink/70 text-[11px] md:text-[14px] hidden sm:block">{subtitle}</p>
       </header>
 
       <article className="group border rule bg-bg/60 overflow-hidden">
@@ -168,7 +168,7 @@ function Carousel({
           />
 
           <span
-            className={`absolute top-3 right-3 font-mono tracking-mono uppercase text-[12px] md:text-[13px] font-bold px-3 py-1.5 ${badgeClasses}`}
+            className={`absolute top-2 right-2 md:top-3 md:right-3 font-mono tracking-mono uppercase text-[9px] md:text-[13px] font-bold px-1.5 py-0.5 md:px-3 md:py-1.5 ${badgeClasses}`}
           >
             {badgeLabel}
           </span>
@@ -179,9 +179,9 @@ function Carousel({
                 type="button"
                 aria-label="Previous"
                 onClick={prev}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-ink text-bg hover:bg-brand hover:text-ink flex items-center justify-center shadow-lg transition-colors"
+                className="absolute left-1.5 md:left-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-12 md:h-12 rounded-full bg-ink text-bg hover:bg-brand hover:text-ink flex items-center justify-center shadow-lg transition-colors"
               >
-                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <svg viewBox="0 0 24 24" className="h-4 w-4 md:h-6 md:w-6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   <path d="M15 18l-6-6 6-6" />
                 </svg>
               </button>
@@ -189,20 +189,20 @@ function Carousel({
                 type="button"
                 aria-label="Next"
                 onClick={next}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-ink text-bg hover:bg-brand hover:text-ink flex items-center justify-center shadow-lg transition-colors"
+                className="absolute right-1.5 md:right-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-12 md:h-12 rounded-full bg-ink text-bg hover:bg-brand hover:text-ink flex items-center justify-center shadow-lg transition-colors"
               >
-                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <svg viewBox="0 0 24 24" className="h-4 w-4 md:h-6 md:w-6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   <path d="M9 6l6 6-6 6" />
                 </svg>
               </button>
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+              <div className="absolute bottom-2 md:bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1 md:gap-1.5">
                 {items.map((_, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => goTo(i)}
                     aria-label={`Go to slide ${i + 1}`}
-                    className={`h-1.5 rounded-full transition-all ${i === index ? 'w-6 bg-ink' : 'w-2 bg-ink/50 hover:bg-ink/80'}`}
+                    className={`h-1 md:h-1.5 rounded-full transition-all ${i === index ? 'w-4 md:w-6 bg-ink' : 'w-1.5 md:w-2 bg-ink/50 hover:bg-ink/80'}`}
                   />
                 ))}
               </div>
@@ -215,19 +215,19 @@ function Carousel({
           target={current.ticketUrl ? '_blank' : undefined}
           rel={current.ticketUrl ? 'noopener noreferrer' : undefined}
           onClick={onInfoClick}
-          className="block p-4 md:p-5 hover:bg-bg/90 transition-colors"
+          className="block p-2.5 md:p-5 hover:bg-bg/90 transition-colors"
         >
-          <p className="font-mono tracking-mono uppercase text-[10px] text-brand">
+          <p className="font-mono tracking-mono uppercase text-[9px] md:text-[10px] text-brand">
             {current.kicker}
           </p>
-          <h3 className="mt-1.5 font-display font-medium text-[18px] md:text-[20px] leading-tight">
+          <h3 className="mt-1 md:mt-1.5 font-display font-medium text-[13px] md:text-[20px] leading-tight">
             {title}
           </h3>
-          <p className="mt-2 font-mono tracking-mono text-[11px] text-ink/60">
+          <p className="mt-1.5 md:mt-2 font-mono tracking-mono text-[10px] md:text-[11px] text-ink/60">
             {current.dateLabel}
           </p>
           {current.ticketUrl && (
-            <p className="mt-3 font-mono tracking-mono uppercase text-[10px] text-ink/60 group-hover:text-brand transition-colors">
+            <p className="mt-2 md:mt-3 font-mono tracking-mono uppercase text-[9px] md:text-[10px] text-ink/60 group-hover:text-brand transition-colors">
               {ticketsLabel} →
             </p>
           )}
@@ -244,8 +244,8 @@ export function EventsShowcase() {
   if (upcomingEvents.length === 0 && pastEvents.length === 0) return null
 
   return (
-    <section className="mx-auto max-w-[1400px] px-5 md:px-8 py-16 md:py-24 border-t rule">
-      <div className="grid md:grid-cols-2 gap-8 md:gap-10">
+    <section className="mx-auto max-w-[1400px] px-3 md:px-8 py-8 md:py-24 border-t rule">
+      <div className="grid grid-cols-2 gap-3 md:gap-10">
         <Carousel
           items={upcomingEvents}
           kicker={tu('kicker')}

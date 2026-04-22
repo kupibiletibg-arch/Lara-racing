@@ -225,7 +225,7 @@ export function TrackHero() {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[240vh]"
+      className="relative md:min-h-[240vh]"
       aria-label="A1 Motor Park hero"
     >
       <div className="md:sticky md:top-16 md:h-[calc(100vh-4rem)]">
@@ -551,7 +551,7 @@ export function TrackHero() {
         </div>
       </div>
 
-      <div aria-hidden className="h-[140vh]" />
+      <div aria-hidden className="hidden md:block h-[140vh]" />
     </section>
   )
 }
