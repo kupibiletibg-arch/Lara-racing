@@ -24,14 +24,28 @@ import { Logo } from '@/components/brand/Logo'
 
 type Stage = 'on' | 'fade' | 'off'
 
+// Lives in module scope — resets only on a real page reload / fresh tab.
+// Keeps the intro from replaying on client-side navigation (menu → menu,
+// locale switch BG ↔ EN) while still firing on the initial visit and on
+// hard refresh.
+let introPlayed = false
+
 export function LoadingScreen() {
-  const [stage, setStage] = useState<Stage>('on')
+  const [stage, setStage] = useState<Stage>(() => (introPlayed ? 'off' : 'on'))
   const [settled, setSettled] = useState(false)
   const [reduced, setReduced] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
   // Stage scheduler + reduced-motion detection.
   useEffect(() => {
+    // Already played in this page lifetime — skip the sequence but still
+    // notify downstream listeners that the page is ready to animate.
+    if (introPlayed) {
+      window.dispatchEvent(new CustomEvent('a1-ready'))
+      return
+    }
+    introPlayed = true
+
     const prefersReduced =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches

@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { trackMeta } from '@/lib/data/track'
 import { ElevationStrip } from './ElevationStrip'
@@ -62,18 +63,18 @@ export function TrackHero() {
             </div>
 
             <div className="mt-8 grid grid-cols-2 gap-2">
-              <a
+              <Link
                 href={`/${locale}/calendar`}
                 className="text-center font-mono tracking-mono uppercase text-[11px] px-4 py-3 bg-brand text-ink hover:bg-brand-deep transition-colors"
               >
                 {t('ctaCalendar')}
-              </a>
-              <a
+              </Link>
+              <Link
                 href={`/${locale}/track`}
                 className="text-center font-mono tracking-mono uppercase text-[11px] px-4 py-3 border rule text-ink hover:bg-ink/5 transition-colors"
               >
                 {t('ctaTrack')}
-              </a>
+              </Link>
             </div>
           </aside>
         </div>
