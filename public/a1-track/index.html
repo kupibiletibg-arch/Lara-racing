@@ -242,13 +242,15 @@ renderer.toneMappingExposure = 0.75;
 renderer.setClearColor(0x000000, 0);
 renderer.autoClear = true;
 
-// Design camera is framed for a landscape stage (~1.3 aspect). On portrait
-// viewports resize() widens vFov so the horizontal field of view stays at
-// least as wide as the landscape design — that alone keeps the full
-// circuit on screen without moving the camera or warping perspective.
+// Design camera is framed for a landscape stage. DESIGN_ASPECT is the
+// floor used when deriving hFov: for any stage aspect narrower than this,
+// we widen vFov so horizontal field of view stays at least as wide as
+// DESIGN_ASPECT × DESIGN_VFOV. 1.5 matches the framing the previous hero
+// layout produced (iframe ≈ 1.48 aspect) so removing the ElevationStrip
+// below the iframe doesn't silently tighten the view and clip rotations.
 const DESIGN_VFOV_DEG = 32;
 const DESIGN_VFOV_RAD = (DESIGN_VFOV_DEG * Math.PI) / 180;
-const DESIGN_ASPECT = 1.3;
+const DESIGN_ASPECT = 1.5;
 const DESIGN_HFOV_RAD =
   2 * Math.atan(Math.tan(DESIGN_VFOV_RAD / 2) * DESIGN_ASPECT);
 
