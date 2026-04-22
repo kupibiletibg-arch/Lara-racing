@@ -12,17 +12,8 @@
 export type InstagramPost = {
   /** Permalink — must be a full https URL to a Post or Reel. */
   permalink: string
-  /** Optional manual like count shown in the custom dark footer. */
-  likes?: number
-  /**
-   * Optional filename under /public/social/ (e.g. "DWlju3GDaJw.jpg").
-   * When present the tile renders the poster behind a play-icon overlay;
-   * otherwise the tile falls back to a branded gradient placeholder.
-   * IG's public pages no longer expose og:image without auth, so posters
-   * have to be saved manually (screenshot each reel's first frame,
-   * drop into public/social/).
-   */
-  poster?: string
+  /** Optional visible caption fallback shown while the embed loads. */
+  caption?: string
 }
 
 export const instagramPosts: InstagramPost[] = [
