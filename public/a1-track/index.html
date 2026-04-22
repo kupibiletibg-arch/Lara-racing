@@ -28,7 +28,7 @@
       start/finish line. Change the path index in the Python pre-processing
       (here idx 195) to move it along the track.
     - Camera angle: `camera.position.set(...)` near the WebGL setup.
-    - Auto-drift speed: `t * 0.04` coefficient in the render loop.
+    - Auto-drift speed: `t * 0.08` coefficient in the render loop.
     - Bloom intensity: UnrealBloomPass constructor args (strength, radius, threshold).
 
   CONTROLS:
@@ -74,6 +74,10 @@
     border-radius: 4px;
     overflow: hidden;
     background: #050506;
+    /* Let vertical swipes pass through to the page scroll; horizontal
+       gestures are captured by the pointerdown handler for 360° rotation.
+       pinch-zoom is already disabled via the <meta viewport> user-scalable=no. */
+    touch-action: pan-y;
   }
   .track-visualiser canvas {
     position: absolute; inset: 0;
@@ -610,7 +614,7 @@ function tick() {
 
   // Keyboard-controlled rotation: arrow left/right rotates track in small steps.
   // Smooth interpolation toward target angle for polished feel.
-  TRACK_GROUP.rotation.y = userRotation + t * 0.04;  // manual + slow drift
+  TRACK_GROUP.rotation.y = userRotation + t * 0.08;  // manual + drift (slightly faster)
 
   // Billboard the checkered flag — always face the camera.
   // Since the flag is a child of TRACK_GROUP (which rotates), we compute the

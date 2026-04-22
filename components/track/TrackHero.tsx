@@ -29,14 +29,13 @@ export function TrackHero() {
               </p>
             </div>
 
-            {/* Stage wrapper.
-             * `touch-none` + `select-none` on mobile kills pinch-zoom and
-             * vertical-pan hijacking by the inner iframe, so the page
-             * scrolls naturally when the user swipes over the track.
-             * On md+ we restore default touch-action so desktop mouse
-             * drag in the viz (pointer events) still works.
+            {/* Stage wrapper. The viz's stage element uses `touch-action:
+             * pan-y` so vertical swipes still scroll the page while
+             * horizontal drags are captured inside the viz for the
+             * manual 360° rotation. Pinch-zoom is disabled via the viz's
+             * own <meta viewport> (user-scalable=no).
              */}
-            <div className="relative flex-1 min-h-0 overflow-hidden touch-none md:touch-auto select-none">
+            <div className="relative flex-1 min-h-0 overflow-hidden select-none">
               <Crosshair className="top-0 left-0" />
               <Crosshair className="top-0 right-0 rotate-90" />
               <Crosshair className="bottom-0 left-0 -rotate-90" />
@@ -48,7 +47,7 @@ export function TrackHero() {
                 loading="eager"
                 scrolling="no"
                 allow="fullscreen"
-                className="absolute inset-0 w-full h-full border-0 bg-transparent pointer-events-none md:pointer-events-auto"
+                className="absolute inset-0 w-full h-full border-0 bg-transparent"
               />
             </div>
 
