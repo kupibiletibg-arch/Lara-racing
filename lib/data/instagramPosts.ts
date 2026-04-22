@@ -12,8 +12,8 @@
 export type InstagramPost = {
   /** Permalink — must be a full https URL to a Post or Reel. */
   permalink: string
-  /** Optional visible caption fallback shown while the embed loads. */
-  caption?: string
+  /** Optional manual like count shown in the custom dark footer. */
+  likes?: number
 }
 
 export const instagramPosts: InstagramPost[] = [
