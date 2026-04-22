@@ -540,7 +540,11 @@ scene.add(glow);
 // with the track. Each frame we read the child's world position and project
 // it to screen space to position the HTML label.
 const markerContainer = document.getElementById('markers');
-const TURN_INDICES = [440, 590, 608, 628, 662, 716, 4, 16, 58, 70, 78, 278, 294, 316, 338];
+// T6 moved off the middle straight (old idx 716, bend ≈ 0.5°) to the real
+// corner where the path bends back up towards the top-west horn at idx 754
+// (~29° bend) — matches the reference map where T6 sits on an actual turn
+// rather than the connecting straight.
+const TURN_INDICES = [440, 590, 608, 628, 662, 754, 4, 16, 58, 70, 78, 278, 294, 316, 338];
 const TURN_LABELS  = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
 
 const markers = TURN_INDICES.map((idx, i) => {
