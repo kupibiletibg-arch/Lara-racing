@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from 'next-intl'
 import { trackMeta } from '@/lib/data/track'
+import { ElevationStrip } from './ElevationStrip'
 
 /**
  * Home-page hero with the "A1 RACING TRACK" 3D visualiser on the left and
@@ -27,7 +28,7 @@ export function TrackHero() {
               </p>
             </div>
 
-            <div className="relative flex-1 min-h-0 border rule bg-bg overflow-hidden">
+            <div className="relative flex-1 min-h-0 overflow-hidden">
               <Crosshair className="top-0 left-0" />
               <Crosshair className="top-0 right-0 rotate-90" />
               <Crosshair className="bottom-0 left-0 -rotate-90" />
@@ -42,6 +43,8 @@ export function TrackHero() {
                 className="absolute inset-0 w-full h-full border-0 bg-transparent"
               />
             </div>
+
+            <ElevationStrip progress={0} className="mt-3 md:mt-4" />
           </div>
 
           {/* RIGHT — hero copy */}
