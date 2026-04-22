@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<!--
+  ==============================================================================
+  TRACK VISUALISER — standalone 3D circuit renderer
+  ==============================================================================
+  Drop-in component. Everything below is self-contained:
+    - HTML + CSS + JS in a single file
+    - External CDN dependencies: Three.js r160, GSAP 3.12, Google Fonts
+    - Matcap texture loaded from `/vendor/matcap_red.png` (REQUIRED — host this
+      file alongside the HTML, or change the path on the line
+      `new THREE.TextureLoader().load('/vendor/matcap_red.png')` below)
+
+  INTEGRATION:
+    Copy the <div class="track-visualiser">...</div> container and the
+    <script type="module">...</script> block into your page. Also include:
+      - Google Fonts <link> tags from <head>
+      - GSAP <script> tag
+      - the <script type="importmap"> for Three.js
+      - the .track-visualiser CSS rules
+    Place the matcap_red.png asset at the path referenced in the JS.
+
+  CUSTOMISING:
+    - PATH_POINTS array (top of module script) — swap in a different track as
+      an array of [x, y] pixel samples. All geometry rebuilds automatically.
+    - TURN_INDICES / TURN_LABELS — corner marker positions (indices 0–399 of
+      the 400-sample path) and their labels.
+    - START_POS / START_PERP — position and perpendicular direction of the
+      start/finish line. Change the path index in the Python pre-processing
+      (here idx 195) to move it along the track.
+    - Camera angle: `camera.position.set(...)` near the WebGL setup.
+    - Auto-drift speed: `t * 0.04` coefficient in the render loop.
+    - Bloom intensity: UnrealBloomPass constructor args (strength, radius, threshold).
+
+  CONTROLS:
+    - Arrow Left/Right — nudge rotation in small steps
+    - Arrow Down or 0   — reset to neutral angle
+    - Click-and-drag on canvas — free 360° rotation
+  ==============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Track Visualiser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wdth,wght@0,75..125,200..900;1,75..125,200..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root {
+    --black: #0a0a0b;
+    --white: #f4f4ed;
+    --red: #e10600;
+    --grey-on: #8a8a8a;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html, body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Mona Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ====== TRACK VISUALISER ======
+     The container element .track-visualiser can be dropped into any page.
+     It has a fixed 16:9 aspect ratio and fills the width of its parent.
+     The canvas fills the container and the HTML markers overlay on top.
+  */
+  .track-visualiser {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 400px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #050506;
+  }
+  .track-visualiser canvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block; z-index: 2;
+  }
+  .track-visualiser .markers {
+    position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  }
+  .track-visualiser .marker {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    text-align: center;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .track-visualiser .marker.visible { opacity: 0.9; }
+  .track-visualiser .marker .tick {
+    width: 2px;
+    height: 26px;
+    background: linear-gradient(to top, rgba(255,255,255,0.7), rgba(255,255,255,0.25));
+    margin: 0 auto 4px;
+  }
+  .track-visualiser .marker .num {
+    font-weight: 700; font-size: 11px;
+  }
+</style>
+</head>
+<body>
+<div class="track-visualiser" id="track-visualiser">
+  <canvas id="three-canvas"></canvas>
+  <div class="markers" id="markers"></div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer }  from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass }      from 'three/addons/postprocessing/ShaderPass.js';
+import { FXAAShader }      from 'three/addons/shaders/FXAAShader.js';
+import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js';
+
+// =========================================================================
+// LANDO-FAITHFUL TRACK VISUALISER
+// Shaders and architecture ported from landonorris.com production bundle.
+// Track geometry generated from your scanned path (centerline sampling).
+// =========================================================================
+
+const PATH_POINTS = [[177.50,26.50],[174.43,27.65],[171.35,28.80],[167.41,30.42],[163.47,32.05],[159.11,33.97],[154.74,35.90],[151.09,37.34],[147.44,38.77],[145.38,39.27],[143.31,39.77],[140.16,41.55],[137.00,43.33],[133.51,46.08],[130.03,48.83],[126.88,52.00],[123.73,55.18],[121.62,58.16],[119.52,61.14],[118.61,62.94],[117.70,64.74],[117.00,66.53],[116.30,68.31],[115.80,70.32],[115.30,72.33],[114.98,74.81],[114.66,77.30],[114.51,80.50],[114.36,83.69],[114.35,87.84],[114.35,91.99],[114.48,97.34],[114.62,102.69],[114.88,109.48],[115.13,116.27],[115.41,123.48],[115.70,130.69],[115.66,135.37],[115.63,140.04],[115.27,144.25],[114.90,148.46],[114.19,152.24],[113.48,156.02],[112.40,159.41],[111.31,162.79],[109.84,165.81],[108.36,168.83],[106.47,171.51],[104.58,174.20],[102.25,176.58],[99.93,178.97],[97.15,181.09],[94.37,183.21],[91.12,185.09],[87.86,186.98],[84.10,188.66],[80.35,190.35],[76.05,191.88],[71.75,193.41],[67.34,195.08],[62.92,196.76],[58.97,198.63],[55.01,200.51],[51.52,202.60],[48.03,204.70],[44.99,207.01],[41.95,209.32],[39.37,211.85],[36.78,214.39],[34.64,217.15],[32.50,219.91],[30.80,222.91],[29.10,225.92],[27.84,229.16],[26.57,232.40],[25.73,235.89],[24.90,239.38],[24.49,243.12],[24.09,246.87],[24.12,250.41],[24.16,253.94],[24.80,256.65],[25.45,259.36],[26.95,261.59],[28.45,263.82],[31.03,265.75],[33.61,267.68],[37.50,269.50],[41.39,271.33],[46.83,273.23],[52.26,275.13],[56.75,276.51],[61.25,277.89],[64.81,278.92],[68.37,279.96],[71.82,280.90],[75.27,281.85],[78.64,282.71],[82.02,283.56],[85.34,284.34],[88.67,285.11],[91.98,285.81],[95.29,286.50],[98.62,287.12],[101.94,287.75],[105.31,288.31],[108.68,288.86],[112.12,289.35],[115.57,289.84],[119.12,290.26],[122.68,290.69],[126.38,291.06],[130.07,291.44],[133.93,291.76],[137.79,292.08],[141.85,292.35],[145.92,292.62],[150.21,292.85],[154.51,293.08],[159.06,293.27],[163.62,293.47],[168.47,293.62],[173.32,293.78],[178.48,293.91],[183.64,294.04],[188.81,294.16],[193.99,294.28],[198.94,294.41],[203.89,294.54],[208.43,294.67],[212.97,294.80],[216.91,294.92],[220.84,295.04],[223.99,295.15],[227.13,295.26],[229.28,295.35],[231.44,295.44],[233.11,295.54],[234.77,295.64],[236.89,295.76],[239.01,295.88],[241.44,296.00],[243.86,296.12],[246.57,296.24],[249.28,296.36],[252.25,296.48],[255.22,296.60],[258.44,296.72],[261.66,296.84],[265.10,296.95],[268.54,297.07],[272.18,297.19],[275.82,297.30],[279.65,297.41],[283.48,297.53],[287.47,297.64],[291.46,297.75],[295.59,297.86],[299.72,297.96],[303.98,298.06],[308.24,298.17],[312.60,298.26],[316.96,298.36],[321.40,298.46],[325.85,298.55],[330.36,298.64],[334.86,298.73],[339.42,298.81],[343.97,298.90],[348.54,298.98],[353.11,299.05],[357.69,299.12],[362.27,299.20],[366.83,299.26],[371.39,299.33],[375.91,299.38],[380.44,299.44],[384.90,299.49],[389.37,299.54],[393.76,299.58],[398.15,299.62],[402.44,299.65],[406.74,299.69],[410.58,299.71],[414.42,299.73],[418.31,299.75],[422.21,299.77],[426.27,299.78],[430.33,299.79],[434.54,299.80],[438.75,299.81],[443.11,299.81],[447.46,299.81],[451.94,299.81],[456.41,299.80],[461.00,299.80],[465.60,299.79],[470.30,299.78],[475.00,299.77],[479.79,299.75],[484.58,299.74],[489.45,299.72],[494.32,299.70],[499.26,299.67],[504.20,299.65],[509.20,299.62],[514.19,299.60],[519.23,299.56],[524.27,299.53],[529.35,299.50],[534.42,299.46],[539.51,299.42],[544.60,299.39],[549.70,299.35],[554.81,299.31],[559.90,299.26],[565.00,299.22],[570.09,299.18],[575.17,299.13],[580.22,299.08],[585.28,299.03],[590.30,298.98],[595.32,298.92],[600.29,298.87],[605.25,298.81],[610.15,298.75],[615.05,298.70],[619.88,298.64],[624.71,298.58],[629.45,298.52],[634.19,298.46],[638.83,298.39],[643.47,298.33],[648.00,298.26],[652.54,298.20],[656.94,298.13],[661.35,298.07],[665.62,298.00],[669.90,297.93],[674.03,297.86],[678.16,297.79],[682.13,297.72],[686.10,297.65],[689.90,297.58],[693.70,297.51],[697.32,297.44],[700.93,297.36],[704.36,297.28],[707.78,297.21],[711.00,297.14],[714.21,297.07],[717.21,297.00],[720.21,296.92],[722.98,296.85],[725.75,296.77],[728.27,296.69],[730.80,296.62],[733.07,296.55],[735.34,296.47],[737.35,296.39],[739.36,296.32],[741.09,296.25],[742.82,296.17],[744.26,296.10],[745.70,296.02],[746.84,295.94],[747.98,295.87],[748.81,295.80],[749.63,295.73],[750.13,295.65],[750.63,295.58],[751.75,294.87],[752.87,294.15],[754.30,291.73],[755.72,289.30],[755.88,286.07],[756.04,282.84],[755.07,279.15],[754.10,275.46],[752.14,271.68],[750.18,267.90],[747.37,264.38],[744.56,260.86],[741.04,257.96],[737.52,255.05],[733.41,252.94],[729.31,250.83],[725.63,249.62],[721.96,248.40],[718.72,248.19],[715.47,247.99],[712.38,248.84],[709.30,249.68],[706.12,251.62],[702.95,253.57],[699.41,256.65],[695.87,259.74],[692.56,262.68],[689.25,265.62],[686.10,267.86],[682.94,270.09],[679.82,271.64],[676.69,273.19],[673.49,274.09],[670.29,274.99],[666.90,275.25],[663.52,275.52],[659.84,275.18],[656.16,274.84],[652.08,273.91],[647.99,272.99],[643.58,271.59],[639.17,270.19],[635.39,269.03],[631.61,267.88],[628.26,267.07],[624.91,266.27],[621.79,265.83],[618.68,265.39],[615.61,265.32],[612.53,265.25],[609.30,265.56],[606.07,265.87],[602.49,266.57],[598.90,267.27],[594.77,268.37],[590.64,269.47],[585.76,270.98],[580.89,272.49],[577.63,273.56],[574.38,274.63],[572.79,275.14],[571.19,275.66],[569.64,276.14],[568.09,276.63],[566.57,277.09],[565.05,277.54],[563.54,277.98],[562.03,278.41],[560.52,278.81],[559.02,279.21],[557.49,279.59],[555.96,279.97],[554.40,280.33],[552.84,280.68],[551.23,281.00],[549.62,281.33],[547.94,281.63],[546.27,281.94],[544.51,282.22],[542.76,282.50],[540.90,282.75],[539.05,283.01],[537.09,283.25],[535.13,283.48],[533.04,283.69],[530.94,283.90],[528.71,284.09],[526.47,284.28],[524.08,284.44],[521.69,284.61],[519.12,284.76],[516.55,284.91],[513.79,285.04],[511.03,285.16],[508.06,285.27],[505.10,285.38],[501.91,285.47],[498.72,285.55],[495.30,285.62],[491.87,285.69],[488.19,285.75],[484.51,285.80],[480.56,285.84],[476.62,285.87],[472.38,285.89],[468.15,285.91],[463.62,285.91],[459.09,285.91],[454.24,285.89],[449.39,285.88],[444.20,285.85],[439.02,285.82],[433.50,285.78],[427.97,285.74],[422.08,285.68],[416.18,285.62],[409.91,285.55],[403.64,285.48],[396.98,285.39],[390.31,285.31],[383.24,285.21],[376.16,285.11],[368.65,285.00],[361.15,284.90],[353.20,284.78],[345.26,284.66],[336.86,284.52],[328.46,284.39],[319.58,284.25],[310.71,284.11],[301.28,283.96],[291.86,283.81],[282.90,283.67],[273.94,283.53],[266.13,283.39],[258.32,283.25],[251.56,283.11],[244.81,282.96],[239.03,282.79],[233.25,282.63],[228.34,282.44],[223.43,282.25],[219.31,282.02],[215.18,281.79],[211.75,281.51],[208.32,281.24],[205.49,280.90],[202.66,280.56],[200.33,280.15],[198.01,279.74],[196.10,279.25],[194.20,278.75],[192.62,278.16],[191.04,277.58],[189.69,276.89],[188.35,276.20],[187.14,275.39],[185.94,274.58],[184.78,273.65],[183.63,272.72],[182.44,271.65],[181.24,270.59],[179.00,268.20],[176.76,265.81],[174.75,262.61],[172.74,259.40],[171.37,255.84],[170.00,252.29],[169.25,248.50],[168.51,244.72],[168.38,240.82],[168.26,236.93],[168.75,233.05],[169.23,229.17],[170.31,225.42],[171.39,221.67],[173.06,218.18],[174.74,214.69],[176.99,211.57],[179.24,208.46],[182.06,205.84],[184.89,203.23],[186.08,202.39],[187.27,201.56],[188.07,201.05],[188.87,200.54],[189.69,200.08],[190.52,199.62],[191.43,199.20],[192.34,198.79],[193.39,198.41],[194.44,198.04],[195.68,197.70],[196.91,197.37],[198.38,197.07],[199.86,196.77],[201.63,196.50],[203.41,196.23],[205.53,195.99],[207.66,195.74],[210.19,195.52],[212.71,195.30],[215.69,195.10],[218.68,194.90],[222.17,194.72],[225.66,194.53],[229.72,194.35],[233.77,194.17],[238.44,194.00],[243.11,193.84],[248.45,193.68],[253.79,193.51],[259.86,193.34],[265.92,193.18],[272.76,193.01],[279.60,192.85],[287.27,192.68],[294.94,192.50],[303.49,192.31],[312.04,192.13],[321.53,191.93],[331.02,191.72],[340.22,191.53],[349.41,191.33],[357.15,191.17],[364.89,191.01],[372.14,190.85],[379.40,190.70],[386.18,190.56],[392.96,190.42],[399.30,190.28],[405.64,190.15],[411.56,190.03],[417.47,189.90],[422.99,189.78],[428.50,189.67],[433.63,189.56],[438.77,189.45],[443.54,189.35],[448.32,189.25],[452.76,189.16],[457.20,189.06],[461.32,188.97],[465.45,188.88],[469.28,188.80],[473.12,188.72],[476.68,188.64],[480.24,188.56],[483.55,188.49],[486.86,188.42],[489.94,188.35],[493.03,188.28],[495.90,188.22],[498.78,188.16],[501.48,188.10],[504.17,188.04],[506.70,187.99],[509.23,187.93],[511.62,187.88],[514.01,187.82],[516.28,187.77],[518.55,187.72],[520.72,187.67],[522.89,187.62],[524.99,187.57],[527.08,187.52],[529.12,187.47],[531.17,187.42],[533.18,187.38],[535.19,187.33],[537.19,187.28],[539.19,187.23],[541.20,187.19],[543.21,187.14],[545.25,187.09],[547.30,187.04],[549.96,186.97],[552.63,186.90],[556.00,186.81],[559.36,186.72],[563.04,186.63],[566.71,186.54],[570.62,186.44],[574.52,186.35],[578.60,186.25],[582.68,186.15],[586.86,186.06],[591.03,185.96],[595.23,185.86],[599.43,185.76],[603.60,185.66],[607.76,185.57],[611.81,185.47],[615.86,185.38],[619.73,185.29],[623.59,185.20],[627.21,185.12],[630.83,185.03],[639.66,184.83],[648.49,184.63],[656.49,184.44],[664.48,184.24],[670.62,184.05],[676.75,183.85],[681.29,183.62],[685.83,183.40],[689.03,183.12],[692.23,182.83],[694.36,182.45],[696.48,182.07],[697.79,181.57],[699.09,181.08],[699.85,180.43],[700.60,179.78],[701.07,178.95],[701.53,178.13],[702.05,176.46],[702.57,174.79],[701.72,172.50],[700.86,170.20],[697.80,168.21],[694.74,166.22],[689.39,164.45],[684.04,162.69],[679.77,161.44],[675.51,160.20],[672.04,158.69],[668.57,157.18],[665.65,155.30],[662.73,153.41],[660.31,151.09],[657.89,148.78],[655.91,145.97],[653.94,143.16],[652.37,139.80],[650.80,136.44],[649.59,132.47],[648.37,128.51],[647.45,123.87],[646.54,119.23],[646.13,117.22],[645.73,115.22],[645.00,112.16],[644.27,109.11],[643.27,105.19],[642.28,101.27],[641.10,96.76],[639.92,92.25],[638.62,87.42],[637.33,82.60],[636.00,77.73],[634.66,72.87],[633.36,68.24],[632.06,63.61],[630.87,59.49],[629.68,55.37],[628.67,52.03],[627.66,48.70],[626.91,46.42],[626.16,44.14],[624.42,40.60],[622.69,37.06],[620.24,34.67],[617.78,32.29],[614.71,31.48],[611.65,30.66],[607.93,31.40],[604.22,32.14],[600.09,34.25],[595.96,36.37],[592.91,38.77],[589.86,41.18],[587.62,43.95],[585.37,46.71],[583.93,49.84],[582.50,52.97],[581.87,56.47],[581.23,59.97],[581.39,63.87],[581.56,67.76],[582.51,72.05],[583.47,76.33],[584.92,80.82],[586.37,85.31],[587.44,89.59],[588.51,93.88],[589.14,97.97],[589.78,102.05],[589.97,105.94],[590.16,109.83],[589.91,113.53],[589.66,117.22],[588.97,120.73],[588.29,124.25],[587.15,127.58],[586.02,130.92],[584.45,134.08],[582.88,137.24],[580.87,140.24],[578.85,143.23],[576.39,146.06],[573.93,148.88],[572.29,150.47],[570.65,152.06],[569.55,153.04],[568.45,154.02],[567.33,154.91],[566.21,155.79],[565.03,156.58],[563.84,157.37],[562.54,158.07],[561.23,158.78],[559.76,159.40],[558.29,160.02],[556.61,160.56],[554.92,161.11],[552.97,161.58],[551.02,162.05],[548.75,162.46],[546.47,162.86],[543.83,163.21],[541.19,163.55],[538.13,163.84],[535.08,164.13],[531.55,164.37],[528.02,164.60],[523.97,164.80],[519.93,164.99],[515.31,165.14],[510.70,165.29],[505.46,165.41],[500.22,165.52],[494.32,165.61],[488.41,165.70],[481.78,165.76],[475.15,165.82],[467.75,165.86],[460.35,165.90],[452.13,165.93],[443.91,165.96],[434.82,165.98],[425.72,165.99],[419.52,166.00],[413.32,166.01],[407.94,166.03],[402.55,166.05],[397.38,166.08],[392.21,166.11],[387.32,166.15],[382.44,166.19],[377.94,166.24],[373.43,166.29],[369.37,166.34],[365.31,166.40],[361.78,166.47],[358.25,166.53],[355.33,166.60],[352.41,166.67],[350.18,166.74],[347.95,166.81],[346.49,166.88],[345.02,166.96],[341.89,167.22],[338.77,167.48],[334.45,167.75],[330.14,168.03],[325.56,168.23],[320.97,168.43],[316.27,168.56],[311.58,168.69],[306.93,168.75],[302.28,168.81],[297.84,168.80],[293.40,168.78],[289.32,168.70],[285.24,168.62],[281.68,168.47],[278.12,168.31],[275.25,168.09],[272.37,167.87],[270.33,167.57],[268.29,167.28],[265.22,166.31],[262.15,165.35],[258.73,163.75],[255.30,162.14],[252.18,160.08],[249.06,158.02],[246.24,155.50],[243.41,152.98],[240.89,150.00],[238.37,147.03],[236.32,143.91],[234.27,140.78],[233.56,139.31],[232.86,137.85],[231.91,135.56],[230.96,133.27],[229.81,130.28],[228.65,127.28],[227.34,123.71],[226.02,120.14],[224.59,116.12],[223.15,112.09],[221.63,107.73],[220.12,103.38],[218.56,98.81],[217.01,94.25],[215.46,89.60],[213.92,84.95],[212.42,80.34],[210.92,75.74],[209.51,71.29],[208.10,66.85],[206.81,62.69],[205.53,58.53],[204.43,54.78],[203.32,51.04],[202.43,47.83],[201.53,44.61],[200.26,40.03],[199.00,35.45],[197.43,31.70],[195.86,27.95],[193.87,26.17],[191.88,24.39],[188.98,24.26],[186.08,24.12],[181.79,25.31]];
+const CX = 781/2, CY = 325/2;
+const PTS = PATH_POINTS.map(([x,y]) => [x - CX, y - CY]);
+
+// ---------- VERTEX SHADER (copied from Lando, simplified comments removed) ----------
+const VERT = `
+varying vec2 vUv;
+varying vec2 vN;
+
+uniform float uThickness;
+
+void main() {
+  vec4 p = vec4(position + normal * uThickness, 1.0);
+  vec3 e = normalize(vec3(modelViewMatrix * p));
+  vec3 n = normalize(normalMatrix * normal);
+  vec3 r = reflect(e, n);
+  float m = 2.0 * sqrt(pow(r.x, 2.0) + pow(r.y, 2.0) + pow(r.z + 1.0, 2.0));
+  vN = r.xy / m + 0.5;
+  gl_Position = projectionMatrix * modelViewMatrix * p;
+  vUv = uv;
+}
+`;
+
+// ---------- FRAGMENT SHADER (ported from Lando, red palette) ----------
+const FRAG = `
+uniform sampler2D uTextureMatcap;
+uniform float uTime;
+uniform float uProgress;
+uniform float uReverse;
+uniform float uRaceDirection;
+
+varying vec2 vUv;
+varying vec2 vN;
+
+void main() {
+  // Lando used cYellow. We use cRed for our palette.
+  vec3 cRed = vec3(1.0, 0.07, 0.02);
+
+  float animation = 0.5 + tan(vUv.x * 10.0 - uTime * uRaceDirection * 2.0) * 0.5;
+  float animationFract = pow(fract(vUv.x * 5.0 - uTime * uRaceDirection), 2.0) * 10.0 - 5.0;
+
+  // Outline bands — thin neon stripes at top and bottom of the ribbon (in UV.y)
+  vec3 upperOutline = vec3(smoothstep(0.14, 0.05, vUv.y));
+  upperOutline -= animationFract * upperOutline * 0.3;
+
+  vec3 bottomOutline = vec3(smoothstep(0.86, 0.95, vUv.y));
+  bottomOutline *= 1.0;
+
+  // Transition (fade-in/out when switching tracks)
+  float transition = smoothstep(uProgress * 1.2, uProgress * 1.2 - 0.2, abs(uReverse - fract(vUv.x * 8.0)));
+
+  // Matcap for fake 3D shading
+  vec3 matcap = texture2D(uTextureMatcap, vN).rgb;
+
+  // Composite alpha
+  float alpha = 0.35;
+  alpha += upperOutline.r;
+  alpha += bottomOutline.r;
+  alpha = clamp(alpha, 0.0, 1.0);
+  alpha -= transition;
+
+  // Composite color
+  vec3 color = vec3(0.12, 0.02, 0.02);
+  color += matcap;
+  color += cRed * upperOutline;
+  color += cRed * bottomOutline;
+
+  gl_FragColor = vec4(color, alpha);
+}
+`;
+
+// ---------- SCENE SETUP ----------
+const canvas = document.getElementById('three-canvas');
+const stage  = document.getElementById('track-visualiser');
+
+const scene  = new THREE.Scene();
+scene.background = null;
+
+const renderer = new THREE.WebGLRenderer({
+  canvas, antialias: true, alpha: true, powerPreference: 'high-performance'
+});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));  // 3× cap for 4K/retina displays
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.75;
+
+const camera = new THREE.PerspectiveCamera(32, 1, 1, 4000);
+camera.position.set(-40, 320, 760);
+camera.lookAt(0, -10, 0);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(1,1), 0.35, 0.45, 0.85);
+composer.addPass(bloom);
+
+// FXAA — smooth edges that remain after bloom. Cheap per-pixel pass.
+const fxaaPass = new ShaderPass(FXAAShader);
+composer.addPass(fxaaPass);
+
+composer.addPass(new OutputPass());
+
+function resize() {
+  const r = stage.getBoundingClientRect();
+  renderer.setSize(r.width, r.height, false);
+  camera.aspect = r.width / r.height;
+  camera.updateProjectionMatrix();
+  composer.setSize(r.width, r.height);
+  // FXAA needs inverse pixel size on resize
+  const pr = renderer.getPixelRatio();
+  fxaaPass.material.uniforms['resolution'].value.set(1 / (r.width * pr), 1 / (r.height * pr));
+}
+
+// ---------- MATCAP TEXTURE ----------
+const matcapTex = new THREE.TextureLoader().load('/vendor/matcap_red.png', (tex) => {
+  // Quality: max anisotropic filtering (up to 16x on most hardware) — sharpens oblique angles
+  tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.generateMipmaps = true;
+  tex.needsUpdate = true;
+});
+matcapTex.colorSpace = THREE.SRGBColorSpace;
+
+// ---------- TRACK GEOMETRY ----------
+// Build a flat ribbon in the XZ plane. UV.x = along track length (for animations),
+// UV.y = across width (for top/bottom outline bands).
+function buildRibbon(center, height) {
+  // Lando's approach: PlaneGeometry-as-vertical-wall.
+  // Two rows of verts along the centerline: BOTTOM row at y=0, TOP row at y=height.
+  // The wall stands on its edge along the track path, like a guardrail.
+  // uv.x runs along path length (for animated lights), uv.y runs top→bottom.
+  const N = center.length;
+  const positions = [];
+  const uvs       = [];
+  const indices   = [];
+
+  // BOTTOM row (uv.y = 1 → bottomOutline smoothstep)
+  for (let i = 0; i < N; i++) {
+    const [x, z] = center[i];
+    positions.push(x, 0, z);
+    uvs.push(i / N, 1);
+  }
+  // TOP row (uv.y = 0 → upperOutline smoothstep)
+  for (let i = 0; i < N; i++) {
+    const [x, z] = center[i];
+    positions.push(x, height, z);
+    uvs.push(i / N, 0);
+  }
+
+  // Stitch quads between adjacent steps: bottom-i, bottom-i+1, top-i+1, top-i
+  for (let i = 0; i < N; i++) {
+    const i2 = (i + 1) % N;
+    const b0 = i, b1 = i2;
+    const t0 = N + i, t1 = N + i2;
+    // tri 1: bottom-i, bottom-i+1, top-i+1
+    indices.push(b0, b1, t1);
+    // tri 2: bottom-i, top-i+1, top-i
+    indices.push(b0, t1, t0);
+  }
+
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  g.setAttribute('uv',       new THREE.Float32BufferAttribute(uvs, 2));
+  g.setIndex(indices);
+  g.computeVertexNormals();
+  return g;
+}
+
+const WALL_HEIGHT = 22;
+const trackGeom = buildRibbon(PTS, WALL_HEIGHT);
+
+// ---------- TWO-MESH SETUP (Lando's inner + outer with opposing uThickness) ----------
+// This is what creates the double-neon-line look.
+const TRACK_GROUP = new THREE.Group();
+scene.add(TRACK_GROUP);
+
+// ---------- START / FINISH LINE (white bar + floating checkered flag) ----------
+// Matches Lando's Miami visualiser: thin white line crossing the track width,
+// with a small checkered square hovering above it.
+const START_POS = { x: -0.19, z: 122.81 };      // centered path coords
+const START_PERP = { x: 0.0131, z: -0.9999 };  // perpendicular to tangent
+
+function makeRect(w, h, yPos, material, renderOrder) {
+  // Build a quad perpendicular to the track path at START_POS.
+  // w = half-length ALONG track (tangent dir), h = half-length ACROSS track (perp dir).
+  const perpX = START_PERP.x, perpZ = START_PERP.z;
+  const tanX = -perpZ, tanZ = perpX;
+  const cx = START_POS.x, cz = START_POS.z;
+  const positions = new Float32Array([
+    cx - tanX*w - perpX*h, yPos, cz - tanZ*w - perpZ*h,
+    cx + tanX*w - perpX*h, yPos, cz + tanZ*w - perpZ*h,
+    cx + tanX*w + perpX*h, yPos, cz + tanZ*w + perpZ*h,
+    cx - tanX*w + perpX*h, yPos, cz - tanZ*w + perpZ*h,
+  ]);
+  const uvs = new Float32Array([0,0, 1,0, 1,1, 0,1]);
+  const indices = [0,1,2, 0,2,3];
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  g.setAttribute('uv',       new THREE.Float32BufferAttribute(uvs, 2));
+  g.setIndex(indices);
+  const mesh = new THREE.Mesh(g, material);
+  mesh.renderOrder = renderOrder;
+  return mesh;
+}
+
+// Part A — thin WHITE BAR lying across the track
+const whiteBarMat = new THREE.MeshBasicMaterial({
+  color: 0xffffff, side: THREE.DoubleSide, toneMapped: false,
+  transparent: true, opacity: 0.95
+});
+const whiteBar = makeRect(1.5, 5, 0.8, whiteBarMat, 10);
+TRACK_GROUP.add(whiteBar);
+
+// Part B — small CHECKERED SQUARE floating above the bar
+const checkerCanvas = document.createElement('canvas');
+checkerCanvas.width = 32; checkerCanvas.height = 32;
+{
+  const ctx = checkerCanvas.getContext('2d');
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
+    ctx.fillStyle = ((r + c) % 2 === 0) ? '#ffffff' : '#000000';
+    ctx.fillRect(c * 8, r * 8, 8, 8);
+  }
+}
+const checkerTex = new THREE.CanvasTexture(checkerCanvas);
+checkerTex.magFilter = THREE.NearestFilter;
+checkerTex.minFilter = THREE.NearestFilter;
+const checkerMat = new THREE.MeshBasicMaterial({
+  map: checkerTex, side: THREE.DoubleSide, toneMapped: false,
+  transparent: false
+});
+// Square hovers above the bar. yPos = WALL_HEIGHT + some extra height
+const checkerSquare = makeRect(6, 6, 30, checkerMat, 11);
+// Orient the checkered square to face the camera somewhat — billboard-like by rotating it upright
+// Actually the quad we built lies FLAT (in XZ plane at yPos). We want it upright.
+// Simpler: build a separate upright quad.
+TRACK_GROUP.remove(checkerSquare);
+
+function makeUprightCheckerSquare() {
+  // Quad centered at origin — placed via mesh.position. This lets us rotate
+  // it freely each frame to billboard toward the camera.
+  const w = 9, h = 9;
+  const positions = new Float32Array([
+    -w, -h, 0,    w, -h, 0,    w, h, 0,   -w, h, 0,
+  ]);
+  const uvs = new Float32Array([0,0, 1,0, 1,1, 0,1]);
+  const indices = [0,1,2, 0,2,3];
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  g.setIndex(indices);
+  const mesh = new THREE.Mesh(g, checkerMat);
+  mesh.position.set(START_POS.x, 42, START_POS.z);  // world placement inside TRACK_GROUP
+  return mesh;
+}
+const uprightChecker = makeUprightCheckerSquare();
+uprightChecker.renderOrder = 11;
+uprightChecker.userData.billboard = true;
+TRACK_GROUP.add(uprightChecker);
+
+// Thin vertical POLE connecting the white bar to the floating flag
+const poleMat = new THREE.MeshBasicMaterial({
+  color: 0xffffff, toneMapped: false, transparent: true, opacity: 0.85
+});
+function makePole() {
+  const cx = START_POS.x, cz = START_POS.z;
+  const t = 0.8; // half-thickness
+  const yBottom = 1;
+  const yTop = 33;
+  const perpX = START_PERP.x, perpZ = START_PERP.z;
+  const tanX = -perpZ, tanZ = perpX;
+  const positions = new Float32Array([
+    cx - tanX*t, yBottom, cz - tanZ*t,
+    cx + tanX*t, yBottom, cz + tanZ*t,
+    cx + tanX*t, yTop,    cz + tanZ*t,
+    cx - tanX*t, yTop,    cz - tanZ*t,
+  ]);
+  const uvs = new Float32Array([0,0, 1,0, 1,1, 0,1]);
+  const indices = [0,1,2, 0,2,3, 0,2,1, 0,3,2];
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  g.setIndex(indices);
+  return new THREE.Mesh(g, poleMat);
+}
+const pole = makePole();
+pole.renderOrder = 10;
+TRACK_GROUP.add(pole);
+
+
+
+// ---------- ROTATION CONTROLS ----------
+// Subtle auto-drift (like Lando) + manual 360° user control via arrows or drag.
+let userRotation = 0;
+const stageEl = document.getElementById('track-visualiser');
+stageEl.style.cursor = 'grab';
+
+// Arrow keys: left/right nudge; down/0 reset to neutral
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft')  userRotation -= 0.06;
+  if (e.key === 'ArrowRight') userRotation += 0.06;
+  if (e.key === 'ArrowDown' || e.key === '0') userRotation = 0;
+});
+
+// Pointer drag — full 360° range
+let dragging = false, dragStartX = 0, dragStartRot = 0;
+stageEl.addEventListener('pointerdown', (e) => {
+  dragging = true;
+  dragStartX = e.clientX;
+  dragStartRot = userRotation;
+  stageEl.setPointerCapture(e.pointerId);
+  stageEl.style.cursor = 'grabbing';
+});
+stageEl.addEventListener('pointermove', (e) => {
+  if (!dragging) return;
+  const dx = e.clientX - dragStartX;
+  const w = stageEl.getBoundingClientRect().width;
+  userRotation = dragStartRot + (dx / w) * Math.PI * 2;  // full drag = 360°
+});
+stageEl.addEventListener('pointerup', () => {
+  dragging = false;
+  stageEl.style.cursor = 'grab';
+});
+
+function makeTrackMat(thickness) {
+  return new THREE.ShaderMaterial({
+    vertexShader:   VERT,
+    fragmentShader: FRAG,
+    side: THREE.DoubleSide,
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      uThickness:     { value: thickness },
+      uTextureMatcap: { value: matcapTex },
+      uTime:          { value: 0 },
+      uProgress:      { value: 0 },
+      uReverse:       { value: 0 },
+      uRaceDirection: { value: 1 },
+    },
+  });
+}
+
+const innerMesh = new THREE.Mesh(trackGeom, makeTrackMat(-2.2));
+const outerMesh = new THREE.Mesh(trackGeom, makeTrackMat( 2.2));
+TRACK_GROUP.add(innerMesh, outerMesh);
+
+// Subtle red radial glow plane under the track
+const glowGeom = new THREE.PlaneGeometry(900, 550);
+const glowMat  = new THREE.ShaderMaterial({
+  uniforms: { uTime: { value: 0 } },
+  transparent: true, depthWrite: false,
+  vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `
+    varying vec2 vUv;
+    void main() {
+      vec2 c = vUv - 0.5;
+      float d = length(c * vec2(1.4, 2.6));
+      float a = smoothstep(0.42, 0.0, d) * 0.06;
+      gl_FragColor = vec4(0.85, 0.03, 0.0, a);
+    }`,
+});
+const glow = new THREE.Mesh(glowGeom, glowMat);
+glow.rotation.x = -Math.PI / 2;
+glow.position.y = -1;
+scene.add(glow);
+
+// ---------- TURN MARKERS ----------
+// Each marker has a hidden Object3D child of TRACK_GROUP, so it rotates/moves
+// with the track. Each frame we read the child's world position and project
+// it to screen space to position the HTML label.
+const markerContainer = document.getElementById('markers');
+const TURN_INDICES = [440, 590, 608, 628, 662, 716, 4, 16, 58, 70, 78, 278, 294, 316, 338];
+const TURN_LABELS  = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
+
+const markers = TURN_INDICES.map((idx, i) => {
+  const el = document.createElement('div');
+  el.className = 'marker';
+  el.innerHTML = `<div class="tick"></div><div class="num">${TURN_LABELS[i]}</div>`;
+  markerContainer.appendChild(el);
+
+  // Local position inside TRACK_GROUP — rotates/moves with the track
+  const [x, z] = PTS[idx];
+  const anchor = new THREE.Object3D();
+  anchor.position.set(x, 22, z);
+  TRACK_GROUP.add(anchor);
+
+  return { el, anchor };
+});
+
+const _worldPos = new THREE.Vector3();
+function updateMarkers() {
+  const r = stage.getBoundingClientRect();
+  for (const m of markers) {
+    m.anchor.getWorldPosition(_worldPos);
+    const v = _worldPos.clone().project(camera);
+    const x = (v.x *  0.5 + 0.5) * r.width;
+    const y = (v.y * -0.5 + 0.5) * r.height;
+    m.el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
+  }
+}
+setTimeout(() => markers.forEach(m => m.el.classList.add('visible')), 900);
+
+// ---------- INITIAL ENTRANCE ANIMATION ----------
+// Track uProgress goes 1 → 0 on load = dissolves in from transparent.
+// Mirror Lando's `translateIn` behavior.
+const TRANSITION_DURATION = 2;
+innerMesh.material.uniforms.uProgress.value = 1;
+outerMesh.material.uniforms.uProgress.value = 1;
+innerMesh.material.uniforms.uReverse.value = 0;
+outerMesh.material.uniforms.uReverse.value = 0;
+
+gsap.to([innerMesh.material.uniforms.uProgress, outerMesh.material.uniforms.uProgress], {
+  value: 0,
+  duration: TRANSITION_DURATION / 2,
+  ease: 'expo.out',
+  delay: 0.3,
+});
+
+// Entrance rotation (like Lando's ±Math.PI/4 translateIn):
+TRACK_GROUP.rotation.y = Math.PI / 4;
+gsap.to(TRACK_GROUP.rotation, {
+  y: 0, duration: TRANSITION_DURATION / 2, ease: 'expo.out', delay: 0.2,
+});
+
+// ---------- RENDER LOOP ----------
+resize();
+window.addEventListener('resize', resize);
+const clock = new THREE.Clock();
+
+function tick() {
+  const t = clock.getElapsedTime();
+  innerMesh.material.uniforms.uTime.value = t;
+  outerMesh.material.uniforms.uTime.value = t;
+  glowMat.uniforms.uTime.value = t;
+
+  // Keyboard-controlled rotation: arrow left/right rotates track in small steps.
+  // Smooth interpolation toward target angle for polished feel.
+  TRACK_GROUP.rotation.y = userRotation + t * 0.04;  // manual + slow drift
+
+  // Billboard the checkered flag — always face the camera.
+  // Since the flag is a child of TRACK_GROUP (which rotates), we compute the
+  // camera direction in the flag's LOCAL space by counter-rotating with the group's Y rotation.
+  const camWorld = camera.position;
+  const flagWorld = new THREE.Vector3();
+  uprightChecker.getWorldPosition(flagWorld);
+  // Direction from flag → camera, in world
+  const toCamWorld = new THREE.Vector3().subVectors(camWorld, flagWorld).normalize();
+  // Convert to TRACK_GROUP local space by undoing the group rotation around Y
+  const cosY = Math.cos(-TRACK_GROUP.rotation.y);
+  const sinY = Math.sin(-TRACK_GROUP.rotation.y);
+  const localX = toCamWorld.x * cosY - toCamWorld.z * sinY;
+  const localZ = toCamWorld.x * sinY + toCamWorld.z * cosY;
+  const yaw = Math.atan2(localX, localZ);
+  uprightChecker.rotation.y = yaw;
+
+  updateMarkers();
+  composer.render();
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+
+</body>
+</html>

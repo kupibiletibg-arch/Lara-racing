@@ -34,3 +34,7 @@ yarn-error.log*
 /.claude/
 /.vercel/
 .vercel
+
+# client-supplied source bundles (the public/ copy is what ships)
+/A1 RACING TRACK/
+/A1 RACING TRACK.zip
