@@ -14,7 +14,7 @@ export function Footer() {
 
       <div className="w-full px-3 md:px-4 pt-12 md:pt-16 pb-4 md:pb-6 flex items-end justify-between gap-6">
         <div className="flex items-end">
-          <Logo />
+          <Logo className="!h-10 md:!h-28" />
         </div>
         <div className="max-w-md text-center hidden md:flex md:items-end">
           <div>
@@ -36,7 +36,7 @@ export function Footer() {
             alt="kupibileti.bg"
             width={1007}
             height={307}
-            className="h-8 md:h-10 w-auto"
+            className="h-10 md:h-10 w-auto"
           />
         </a>
       </div>
