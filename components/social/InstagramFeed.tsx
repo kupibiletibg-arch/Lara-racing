@@ -54,11 +54,11 @@ export function InstagramFeed() {
         </a>
       </div>
 
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 items-start">
         {instagramPosts.map((p, i) => (
           <li
             key={`${p.permalink}-${i}`}
-            className="relative aspect-[9/14] overflow-hidden bg-[#050505] [&_.instagram-media]:!m-0 [&_.instagram-media]:!min-w-0 [&_.instagram-media]:!max-w-full [&_.instagram-media]:!w-full [&_.instagram-media]:!absolute [&_.instagram-media]:!inset-0 [&_.instagram-media]:!border-0 [&_.instagram-media]:!rounded-none [&_.instagram-media]:!shadow-none [&_iframe]:!absolute [&_iframe]:!inset-0 [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!max-w-none"
+            className="[&_.instagram-media]:!m-0 [&_.instagram-media]:!min-w-0 [&_.instagram-media]:!w-full"
           >
             <blockquote
               className="instagram-media"
