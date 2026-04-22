@@ -133,6 +133,19 @@
   "social": {
     "kicker": "LIFE AT THE TRACK",
     "title": "Follow us on Instagram",
-    "subtitle": "Latest photos, reels and behind-the-scenes from A1 Motor Park."
+    "subtitle": "Latest photos, reels and behind-the-scenes from A1 Motor Park.",
+    "profile": {
+      "follow": "Follow",
+      "posts": "131 posts",
+      "followers": "22.8K followers",
+      "following": "18 following",
+      "displayName": "A1 Motor Park",
+      "bio": "Bulgaria's first FIA Grade 3 circuit · Samokov\n3.91 km · 15 turns · 585 m altitude\nTrack days · championships · schools · events",
+      "tabs": {
+        "grid": "Posts",
+        "reels": "Reels",
+        "tagged": "Tagged"
+      }
+    }
   }
 }

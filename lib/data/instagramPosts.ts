@@ -14,6 +14,12 @@ export type InstagramPost = {
   permalink: string
   /** Optional visible caption fallback shown while the embed loads. */
   caption?: string
+  /**
+   * Optional poster file (lives in `/public/social/`). When set, renders as a
+   * square thumbnail in the profile grid. When missing, the tile falls back
+   * to the dark brand gradient + reel glyph.
+   */
+  poster?: string
 }
 
 export const instagramPosts: InstagramPost[] = [
