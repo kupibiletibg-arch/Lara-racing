@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { trackMeta } from '@/lib/data/track'
-import { ElevationStrip } from './ElevationStrip'
 
 /**
  * Home-page hero with the "A1 RACING TRACK" 3D visualiser on the left and
@@ -50,8 +49,6 @@ export function TrackHero() {
                 className="absolute inset-0 w-full h-full border-0 bg-transparent"
               />
             </div>
-
-            <ElevationStrip progress={0} className="mt-3 md:mt-4 relative z-[1] shrink-0" />
           </div>
 
           {/* RIGHT — hero copy */}

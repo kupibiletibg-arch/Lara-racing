@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server'
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import { TrackHero } from '@/components/track/TrackHero'
+import { ScrollElevationBar } from '@/components/track/ScrollElevationBar'
 import { EventsHero } from '@/components/calendar/EventsHero'
 import { FacilityMap } from '@/components/facilities/FacilityMap'
 import { trackMeta } from '@/lib/data/track'
@@ -15,6 +16,11 @@ export default async function Home({ params }: { params: { locale: string } }) {
   return (
     <>
       <TrackHero />
+
+      {/* Sticky elevation bar — once the hero scrolls out, this stays
+          pinned below the header and its red indicator tracks the
+          viewer's scroll progress through the remainder of the page. */}
+      <ScrollElevationBar />
 
       <EventsHero />
 
