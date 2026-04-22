@@ -17,7 +17,6 @@ export type InstagramPost = {
 }
 
 export const instagramPosts: InstagramPost[] = [
-  { permalink: 'https://www.instagram.com/p/DXUCC08jaXG/' },
   { permalink: 'https://www.instagram.com/reel/DWlju3GDaJw/' },
   { permalink: 'https://www.instagram.com/reel/DXbTzALNMyx/' },
   { permalink: 'https://www.instagram.com/reel/DXYq_57NyT1/' },
