@@ -227,11 +227,20 @@ const scene  = new THREE.Scene();
 scene.background = null;
 
 const renderer = new THREE.WebGLRenderer({
-  canvas, antialias: true, alpha: true, powerPreference: 'high-performance'
+  canvas,
+  antialias: true,
+  alpha: true,                  // keep the canvas transparent
+  premultipliedAlpha: false,    // so composer passes don't fill the bg with black
+  powerPreference: 'high-performance',
 });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));  // 3× cap for 4K/retina displays
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.75;
+// Force every internal clear (including between EffectComposer passes) to
+// a fully-transparent buffer so the page's own background (--bg) shows
+// through around the track instead of a black stage panel.
+renderer.setClearColor(0x000000, 0);
+renderer.autoClear = true;
 
 // Design camera is framed for a landscape stage (~1.3 aspect). On portrait
 // viewports resize() widens vFov so the horizontal field of view stays at
