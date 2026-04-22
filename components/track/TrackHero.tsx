@@ -21,7 +21,7 @@ export function TrackHero() {
       <div className="md:sticky md:top-24 md:h-[calc(100vh-7rem)]">
         <div className="mx-auto max-w-[1400px] w-full md:h-full px-5 md:px-8 pb-6 md:pb-10 pt-5 md:pt-8 flex flex-col md:grid md:grid-cols-[1fr_360px] gap-8 md:gap-10 md:items-stretch">
           {/* LEFT — 3D stage */}
-          <div className="relative flex flex-col min-h-[56vh] md:min-h-0">
+          <div className="relative flex flex-col min-h-[62vh] md:min-h-0">
             <div className="flex items-baseline justify-between gap-4 mb-3 md:mb-4">
               <p className="telemetry">{t('kicker')}</p>
               <p className="telemetry hidden md:block">
@@ -29,7 +29,14 @@ export function TrackHero() {
               </p>
             </div>
 
-            <div className="relative flex-1 min-h-0 overflow-hidden">
+            {/* Stage wrapper.
+             * `touch-none` + `select-none` on mobile kills pinch-zoom and
+             * vertical-pan hijacking by the inner iframe, so the page
+             * scrolls naturally when the user swipes over the track.
+             * On md+ we restore default touch-action so desktop mouse
+             * drag in the viz (pointer events) still works.
+             */}
+            <div className="relative flex-1 min-h-0 overflow-hidden touch-none md:touch-auto select-none">
               <Crosshair className="top-0 left-0" />
               <Crosshair className="top-0 right-0 rotate-90" />
               <Crosshair className="bottom-0 left-0 -rotate-90" />
@@ -41,11 +48,11 @@ export function TrackHero() {
                 loading="eager"
                 scrolling="no"
                 allow="fullscreen"
-                className="absolute inset-0 w-full h-full border-0 bg-transparent"
+                className="absolute inset-0 w-full h-full border-0 bg-transparent pointer-events-none md:pointer-events-auto"
               />
             </div>
 
-            <ElevationStrip progress={0} className="mt-3 md:mt-4" />
+            <ElevationStrip progress={0} className="mt-3 md:mt-4 relative z-[1] shrink-0" />
           </div>
 
           {/* RIGHT — hero copy */}
