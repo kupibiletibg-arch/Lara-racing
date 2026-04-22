@@ -12,20 +12,24 @@ export function Footer() {
         <PartnersMarquee />
       </div>
 
-      <div className="w-full px-3 md:px-4 py-12 md:py-16 flex items-start justify-between gap-6">
-        <Logo />
-        <div className="max-w-md text-center hidden md:block">
-          <p className="text-ink/80 font-display text-lg leading-snug">{t('tagline')}</p>
-          <p className="mt-4 font-mono tracking-mono uppercase text-[11px] text-ink/50">
-            Samokov · Bulgaria · 42°19′N 23°34′E · 585 m
-          </p>
+      <div className="w-full px-3 md:px-4 pt-12 md:pt-16 pb-4 md:pb-6 flex items-end justify-between gap-6">
+        <div className="flex items-end">
+          <Logo />
+        </div>
+        <div className="max-w-md text-center hidden md:flex md:items-end">
+          <div>
+            <p className="text-ink/80 font-display text-lg leading-snug">{t('tagline')}</p>
+            <p className="mt-4 font-mono tracking-mono uppercase text-[11px] text-ink/50">
+              Samokov · Bulgaria · 42°19′N 23°34′E · 585 m
+            </p>
+          </div>
         </div>
         <a
           href="https://www.kupibileti.bg/bg/about-event/2292"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="kupibileti.bg"
-          className="flex items-center hover:opacity-90 transition-opacity"
+          className="flex items-end hover:opacity-90 transition-opacity"
         >
           <Image
             src="/partners/kupibileti.svg"
