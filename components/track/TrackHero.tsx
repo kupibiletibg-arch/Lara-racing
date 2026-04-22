@@ -19,7 +19,7 @@ export function TrackHero() {
   return (
     <section className="relative" aria-label="A1 Motor Park hero">
       <div className="md:sticky md:top-24 md:h-[calc(100vh-7rem)]">
-        <div className="mx-auto max-w-[1400px] w-full md:h-full px-5 md:px-8 pb-6 md:pb-10 pt-5 md:pt-8 flex flex-col md:grid md:grid-cols-[1fr_360px] gap-8 md:gap-10 md:items-stretch">
+        <div className="mx-auto max-w-[1400px] w-full md:h-full px-5 md:px-8 pb-6 md:pb-10 pt-5 md:pt-8 flex flex-col md:grid md:grid-cols-[1fr_280px] gap-8 md:gap-6 lg:gap-8 md:items-stretch">
           {/* LEFT — 3D stage */}
           <div className="relative flex flex-col min-h-[62vh] md:min-h-0">
             <div className="flex items-baseline justify-between gap-4 mb-3 md:mb-4">

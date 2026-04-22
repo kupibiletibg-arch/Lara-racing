@@ -281,12 +281,11 @@ function resize() {
   const targetVFov = 2 * Math.atan(Math.tan(targetHFov / 2) / aspect);
   camera.fov = (targetVFov * 180) / Math.PI;
 
-  // Always pull the camera back at least 1.2× so there's breathing room
-  // around the track on every viewport — fixes the slight horizontal clip
-  // on wide desktop stages where the design framing sat too close.
-  // Portrait viewports get an even larger pullback (DESIGN_ASPECT / aspect)
-  // to fit the full circuit without clipping the sides.
-  const zoomOut = Math.max(1.2, DESIGN_ASPECT / aspect);
+  // Pull the camera back only for portrait viewports that would
+  // otherwise clip the circuit. Desktop keeps the tight design framing
+  // — the left column gets widened in the React layout instead of
+  // shrinking the track to fit.
+  const zoomOut = aspect < DESIGN_ASPECT ? DESIGN_ASPECT / aspect : 1;
   const dir = BASE_CAM_POS.clone().sub(BASE_LOOK_AT);
   camera.position.copy(dir.multiplyScalar(zoomOut).add(BASE_LOOK_AT));
   camera.lookAt(BASE_LOOK_AT);
