@@ -1,64 +1,29 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { instagramPosts } from '@/lib/data/instagramPosts'
+import { instagramPosts, type InstagramPost } from '@/lib/data/instagramPosts'
 
 /**
- * Hand-curated Instagram feed with a **custom dark-themed chrome** around
- * each reel. Instagram's own /embed/ iframe ships a hard-coded light-theme
- * header (username + logo) and footer (likes + caption + view link) that
- * clash with our dark site. We can't restyle the iframe contents across
- * origins, but we can:
+ * Hand-curated Instagram feed. Each reel renders as a **self-contained dark
+ * card** with our own chrome — no IG iframe, no white chrome leak. Tiles
+ * are equal size (9 : 16 aspect) arranged in a 1 / 2 / 3-column grid. The
+ * whole card is a single outbound link to the reel permalink so a tap
+ * anywhere opens it on Instagram in a new tab.
  *
- *   1. Clip the iframe vertically so only the video surface is visible
- *      (hide IG's ~54 px top chrome and ~84 px bottom chrome).
- *   2. Render our own dark header (@a1.motor.park chip) and footer
- *      (like count — manual, optional — and "View on Instagram →" link).
- *
- * The whole section is lazy-mounted via IntersectionObserver so the iframes
- * (and IG's native autoplay of the first in-view reel) fire as the user
- * scrolls into the section.
+ * A poster JPG sitting under /public/social/<shortcode>.jpg (set via
+ * InstagramPost.poster or derived from the permalink) is shown behind a
+ * brand-red play button. When no poster is available the card degrades to
+ * a dark brand gradient with the same play button — still on-theme, still
+ * the same size as the rest.
  */
-
-const IG_TOP_CHROME_PX = 54
-const IG_BOTTOM_CHROME_PX = 84
-
 export function InstagramFeed() {
   const t = useTranslations('social')
-  const sectionRef = useRef<HTMLElement | null>(null)
-  const [shouldLoad, setShouldLoad] = useState(false)
-
-  useEffect(() => {
-    if (shouldLoad) return
-    const node = sectionRef.current
-    if (!node) return
-
-    if (typeof IntersectionObserver === 'undefined') {
-      setShouldLoad(true)
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setShouldLoad(true)
-          observer.disconnect()
-        }
-      },
-      { rootMargin: '0px 0px 200px 0px', threshold: 0.15 },
-    )
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [shouldLoad])
 
   if (instagramPosts.length === 0) return null
 
   return (
-    <section
-      ref={sectionRef}
-      className="mx-auto max-w-[1400px] px-5 md:px-8 py-16 md:py-24 border-t rule"
-    >
+    <section className="mx-auto max-w-[1400px] px-5 md:px-8 py-16 md:py-24 border-t rule">
       <div className="flex items-end justify-between gap-6 mb-8 md:mb-12 flex-wrap">
         <div>
           <p className="telemetry mb-2">{t('kicker')}</p>
@@ -78,41 +43,28 @@ export function InstagramFeed() {
         </a>
       </div>
 
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        {instagramPosts.map((post, i) => (
-          <ReelTile
-            key={post.permalink}
-            permalink={post.permalink}
-            likes={post.likes}
-            featured={i === 0}
-            shouldLoad={shouldLoad}
-          />
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+        {instagramPosts.map((post) => (
+          <ReelCard key={post.permalink} post={post} />
         ))}
       </ul>
     </section>
   )
 }
 
-function ReelTile({
-  permalink,
-  likes,
-  featured,
-  shouldLoad,
-}: {
-  permalink: string
-  likes?: number
-  featured: boolean
-  shouldLoad: boolean
-}) {
-  const embedUrl = `${permalink.replace(/\/$/, '')}/embed`
-  const cellClasses = featured
-    ? 'sm:col-span-2 lg:col-span-2 lg:row-span-2'
-    : ''
+function ReelCard({ post }: { post: InstagramPost }) {
+  const posterSrc = post.poster ? `/social/${post.poster}` : null
 
   return (
-    <li className={cellClasses}>
-      <article className="group flex flex-col bg-bg border rule overflow-hidden">
-        {/* Dark header — mirrors IG's username strip without the light bg */}
+    <li>
+      <a
+        href={post.permalink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group block bg-bg border rule overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+        aria-label="Open reel on Instagram"
+      >
+        {/* Dark header */}
         <header className="flex items-center gap-2.5 px-3 py-2.5 border-b rule">
           <div className="shrink-0 w-8 h-8 rounded-full bg-brand flex items-center justify-center font-mono text-[10px] font-bold text-ink">
             A1
@@ -127,42 +79,41 @@ function ReelTile({
           </div>
         </header>
 
-        {/* Video surface — IG iframe clipped to hide its light chrome */}
-        <div
-          className="relative w-full bg-bg overflow-hidden"
-          style={{ aspectRatio: '9 / 16' }}
-        >
-          {shouldLoad ? (
-            <iframe
-              src={embedUrl}
-              title="Instagram reel"
-              loading="lazy"
-              scrolling="no"
-              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-              allowFullScreen
-              referrerPolicy="strict-origin-when-cross-origin"
-              className="absolute left-0 w-full border-0"
-              style={{
-                top: `-${IG_TOP_CHROME_PX}px`,
-                height: `calc(100% + ${IG_TOP_CHROME_PX + IG_BOTTOM_CHROME_PX}px)`,
+        {/* 9:16 poster panel with play overlay */}
+        <div className="relative w-full aspect-[9/16] overflow-hidden bg-gradient-to-br from-brand-deep/30 via-bg to-bg">
+          {posterSrc && (
+            <Image
+              src={posterSrc}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              // Posters may not exist yet — fail silently to the gradient.
+              onError={(e) => {
+                ;(e.currentTarget as HTMLImageElement).style.display = 'none'
               }}
             />
-          ) : (
-            <a
-              href={permalink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute inset-0 flex items-center justify-center text-ink/40 font-mono tracking-mono uppercase text-[11px]"
-              aria-label="Open reel on Instagram"
-            >
-              ▸ REEL
-            </a>
           )}
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-t from-bg/60 via-transparent to-transparent"
+          />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-brand/90 backdrop-blur-sm flex items-center justify-center shadow-[0_6px_24px_rgba(200,16,46,0.35)] transition-transform duration-300 group-hover:scale-110">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5 md:h-6 md:w-6 fill-current text-ink ml-0.5"
+                aria-hidden
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
         </div>
 
-        {/* Dark footer — likes + outbound link in our palette */}
+        {/* Dark footer */}
         <footer className="flex items-center justify-between gap-3 px-3 py-2.5 border-t rule">
-          {typeof likes === 'number' ? (
+          {typeof post.likes === 'number' ? (
             <span className="flex items-center gap-1.5 font-mono text-[12px] text-ink/80">
               <svg
                 viewBox="0 0 24 24"
@@ -172,23 +123,18 @@ function ReelTile({
               >
                 <path d="M12 21s-7.5-4.5-9.5-10C1 7 4 4 7 4c2 0 3.5 1 5 3 1.5-2 3-3 5-3 3 0 6 3 4.5 7-2 5.5-9.5 10-9.5 10z" />
               </svg>
-              <span className="tabular-nums">{formatLikes(likes)}</span>
+              <span className="tabular-nums">{formatLikes(post.likes)}</span>
             </span>
           ) : (
             <span className="font-mono tracking-mono uppercase text-[10px] text-ink/40">
               @a1.motor.park
             </span>
           )}
-          <a
-            href={permalink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono tracking-mono uppercase text-[10px] text-ink/60 hover:text-brand transition-colors"
-          >
+          <span className="font-mono tracking-mono uppercase text-[10px] text-ink/60 group-hover:text-brand transition-colors">
             View on Instagram →
-          </a>
+          </span>
         </footer>
-      </article>
+      </a>
     </li>
   )
 }
