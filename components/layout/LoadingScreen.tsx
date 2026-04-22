@@ -1,83 +1,100 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useTranslations } from 'next-intl'
-import { trackPath, trackViewBox } from '@/lib/data/track'
+import { useEffect, useRef, useState } from 'react'
 import { Logo } from '@/components/brand/Logo'
 
 /**
- * Full-viewport loading screen shown on initial mount. A red dot rides the
- * real A1 racing line on loop while the page assets settle. Fades out after
- * ~1.8s and unmounts entirely.
+ * Full-viewport intro shown on initial mount:
+ *   0.0 – 2.0 s  video plays full-frame
+ *   2.0 – 3.2 s  video crossfades out, A1 Motor Park logo fades in
+ *   3.2 – 3.8 s  logo held solo
+ *   3.8 s        whole overlay fades for 500 ms, then unmounts and
+ *                dispatches `'a1-ready'` so TrackHero can start.
  *
- * Uses SVG's native <animateMotion> so the dot animation is GPU-backed and
- * runs even before React hydration finishes.
+ * Respects `prefers-reduced-motion` by skipping the video entirely and
+ * revealing just the logo for a brief moment.
  */
+
+type Stage = 'video' | 'logo' | 'fade' | 'off'
+
 export function LoadingScreen() {
-  const t = useTranslations('common')
-  const [stage, setStage] = useState<'on' | 'fade' | 'off'>('on')
+  const [stage, setStage] = useState<Stage>('video')
+  const videoRef = useRef<HTMLVideoElement | null>(null)
 
   useEffect(() => {
-    const t1 = window.setTimeout(() => setStage('fade'), 1800)
-    const t2 = window.setTimeout(() => {
-      setStage('off')
-      // Signal the TrackHero to start its sequence now that we're out of the way.
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    const timers: number[] = []
+    const fireReady = () =>
       window.dispatchEvent(new CustomEvent('a1-ready'))
-    }, 2300)
-    return () => {
-      clearTimeout(t1)
-      clearTimeout(t2)
+
+    if (reduced) {
+      setStage('logo')
+      timers.push(window.setTimeout(() => setStage('fade'), 500))
+      timers.push(
+        window.setTimeout(() => {
+          setStage('off')
+          fireReady()
+        }, 1000),
+      )
+    } else {
+      timers.push(window.setTimeout(() => setStage('logo'), 2000))
+      timers.push(window.setTimeout(() => setStage('fade'), 3500))
+      timers.push(
+        window.setTimeout(() => {
+          setStage('off')
+          fireReady()
+        }, 4100),
+      )
     }
+
+    return () => {
+      timers.forEach(clearTimeout)
+    }
+  }, [])
+
+  // Best-effort autoplay: iOS Safari requires `playsInline` + `muted` +
+  // the `play()` call to be kicked in response to the mount.
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    v.muted = true
+    const p = v.play()
+    if (p && typeof p.catch === 'function') p.catch(() => {})
   }, [])
 
   if (stage === 'off') return null
 
-  const { x, y, w, h } = trackViewBox
+  const fading = stage === 'fade'
+  const showLogo = stage === 'logo' || stage === 'fade'
 
   return (
     <div
       aria-hidden
-      className={`fixed inset-0 z-[200] bg-bg flex items-center justify-center transition-opacity duration-500 ${
-        stage === 'fade' ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      className={`fixed inset-0 z-[200] bg-bg flex items-center justify-center overflow-hidden transition-opacity duration-500 ${
+        fading ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
-      <div className="flex flex-col items-center gap-8">
-        <Logo />
-        <svg
-          viewBox={`${x} ${y} ${w} ${h}`}
-          className="h-48 w-auto md:h-60"
-          fill="none"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          <defs>
-            <filter id="ls-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="6" />
-            </filter>
-          </defs>
-          <path
-            id="loader-line"
-            d={trackPath}
-            stroke="var(--line)"
-            strokeOpacity="0.25"
-            strokeWidth="4"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
-          <circle r={16} fill="var(--brand)" fillOpacity="0.35" filter="url(#ls-glow)">
-            <animateMotion dur="2s" repeatCount="indefinite" rotate="auto">
-              <mpath href="#loader-line" />
-            </animateMotion>
-          </circle>
-          <circle r={5} fill="var(--brand)" stroke="var(--ink)" strokeWidth="1.5">
-            <animateMotion dur="2s" repeatCount="indefinite" rotate="auto">
-              <mpath href="#loader-line" />
-            </animateMotion>
-          </circle>
-        </svg>
-        <p className="font-mono tracking-mono uppercase text-[10px] text-ink/50">
-          {t('loading')}
-        </p>
+      <video
+        ref={videoRef}
+        src="/loading/intro.mp4"
+        poster="/loading/intro-poster.jpg"
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-out ${
+          showLogo ? 'opacity-0' : 'opacity-100'
+        }`}
+      />
+      <div
+        className={`relative z-10 transition-opacity duration-[1200ms] ease-out ${
+          showLogo ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <Logo className="!h-24 md:!h-32" />
       </div>
     </div>
   )
