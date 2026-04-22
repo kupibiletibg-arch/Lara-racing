@@ -1,35 +1,20 @@
 'use client'
 
-import Script from 'next/script'
-import { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { instagramPosts } from '@/lib/data/instagramPosts'
 
 /**
- * Hand-curated Instagram feed rendered via the official Instagram oEmbed
- * markup (`<blockquote class="instagram-media">`). `//www.instagram.com/embed.js`
- * transforms the blockquotes into iframes once it finishes loading, and we
- * call `window.instgrm.Embeds.process()` on mount so subsequent client-side
- * navigation also triggers embed expansion.
+ * Hand-curated Instagram feed rendered as direct `/reel/<SHORTCODE>/embed/`
+ * iframes. Each iframe receives `allow="autoplay; encrypted-media; fullscreen;
+ * picture-in-picture"` which is what lets Instagram's reel player start the
+ * video inline when the viewer taps play, instead of bouncing them out to
+ * instagram.com.
  *
- * Layout: one shared row of 5 equal tiles on lg (all reels side-by-side);
- * wraps down to 3-col / 2-col / 1-col on smaller breakpoints.
+ * Each tile is wrapped in an aspect-[9/16] box so all five tiles share the
+ * exact same shape regardless of IG's own chrome sizing.
  */
-declare global {
-  interface Window {
-    instgrm?: {
-      Embeds?: { process?: () => void }
-    }
-  }
-}
-
 export function InstagramFeed() {
   const t = useTranslations('social')
-
-  useEffect(() => {
-    // Re-scan on mount in case the script was loaded by a previous route.
-    window.instgrm?.Embeds?.process?.()
-  }, [])
 
   if (instagramPosts.length === 0) return null
 
@@ -54,43 +39,31 @@ export function InstagramFeed() {
         </a>
       </div>
 
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 items-start">
-        {instagramPosts.map((p, i) => (
-          <li
-            key={`${p.permalink}-${i}`}
-            className="[&_.instagram-media]:!m-0 [&_.instagram-media]:!min-w-0 [&_.instagram-media]:!w-full"
-          >
-            <blockquote
-              className="instagram-media"
-              data-instgrm-permalink={p.permalink}
-              data-instgrm-version="14"
-              style={{ background: '#050505' }}
-            >
-              {p.caption && (
-                <a
-                  href={p.permalink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block p-4 text-ink/70 text-sm"
-                >
-                  {p.caption}
-                </a>
-              )}
-            </blockquote>
-          </li>
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        {instagramPosts.map((p) => (
+          <ReelTile key={p.permalink} permalink={p.permalink} />
         ))}
       </ul>
-
-      {/* Official Instagram embed runtime. `afterInteractive` lets it load
-          once the page is interactive; subsequent mounts call the
-          re-processing hook in the useEffect above. */}
-      <Script
-        src="https://www.instagram.com/embed.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          window.instgrm?.Embeds?.process?.()
-        }}
-      />
     </section>
+  )
+}
+
+function ReelTile({ permalink }: { permalink: string }) {
+  const embedUrl = `${permalink.replace(/\/$/, '')}/embed`
+  return (
+    <li>
+      <div className="relative w-full aspect-[9/16] overflow-hidden bg-[#050505]">
+        <iframe
+          src={embedUrl}
+          title="Instagram reel"
+          loading="lazy"
+          scrolling="no"
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+          className="absolute inset-0 w-full h-full border-0"
+        />
+      </div>
+    </li>
   )
 }
