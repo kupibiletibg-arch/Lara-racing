@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { TrackHero } from '@/components/track/TrackHero'
 import { EventsHero } from '@/components/calendar/EventsHero'
 import { FacilityMap } from '@/components/facilities/FacilityMap'
-import { InstagramFeed } from '@/components/social/InstagramFeed'
 import { trackMeta } from '@/lib/data/track'
 
 export default async function Home({ params }: { params: { locale: string } }) {
@@ -57,8 +56,6 @@ export default async function Home({ params }: { params: { locale: string } }) {
           </figure>
         </div>
       </section>
-
-      <InstagramFeed />
     </>
   )
 }
