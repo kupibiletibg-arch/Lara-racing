@@ -223,8 +223,14 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.75;
 
 const camera = new THREE.PerspectiveCamera(32, 1, 1, 4000);
-camera.position.set(-40, 320, 760);
-camera.lookAt(0, -10, 0);
+// Design camera position (landscape / square viewports). On portrait
+// viewports resize() lerps the camera backwards along this same vector so
+// the full track fits horizontally without clipping — perspective stays
+// intact, we just see the circuit from further away.
+const BASE_CAM_POS = new THREE.Vector3(-40, 320, 760);
+const BASE_LOOK_AT = new THREE.Vector3(0, -10, 0);
+camera.position.copy(BASE_CAM_POS);
+camera.lookAt(BASE_LOOK_AT);
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
@@ -240,7 +246,19 @@ composer.addPass(new OutputPass());
 function resize() {
   const r = stage.getBoundingClientRect();
   renderer.setSize(r.width, r.height, false);
-  camera.aspect = r.width / r.height;
+  const aspect = r.width / r.height;
+  camera.aspect = aspect;
+
+  // Responsive zoom: the design framing assumes a roughly landscape stage.
+  // Portrait / narrow stages (phones) get the camera pulled backwards along
+  // the same sight-line so the track no longer bleeds off the sides.
+  // `zoomOut = 1 / aspect` keeps the track's on-screen width constant;
+  // we cap at 1.9× to avoid an excessively tiny track on ultra-narrow cases.
+  const zoomOut = aspect < 1 ? Math.min(1 / aspect, 1.9) : 1;
+  const dir = BASE_CAM_POS.clone().sub(BASE_LOOK_AT);
+  camera.position.copy(dir.multiplyScalar(zoomOut).add(BASE_LOOK_AT));
+  camera.lookAt(BASE_LOOK_AT);
+
   camera.updateProjectionMatrix();
   composer.setSize(r.width, r.height);
   // FXAA needs inverse pixel size on resize
