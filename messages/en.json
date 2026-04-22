@@ -49,6 +49,18 @@
       "upcoming": "Upcoming",
       "past": "Past",
       "reset": "Clear filters"
+    },
+    "featured": {
+      "kicker": "EVENTS · 2026",
+      "title": "Events",
+      "subtitle": "Experience racing, rallies, supercars and so much more at Bulgaria's first FIA Grade 3 circuit.",
+      "cta": "Event calendar",
+      "categories": {
+        "cars": "Track championships, cup series and GT races.",
+        "moto": "Motorcycle racing, track days and riding schools.",
+        "endurance": "Long-format racing and the BES 999 six-hour round.",
+        "rally": "Rallies, recce stages and supercar tours."
+      }
     }
   },
   "facilities": {
