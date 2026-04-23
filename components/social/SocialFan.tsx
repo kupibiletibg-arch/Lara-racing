@@ -19,6 +19,15 @@ const IG_HREF = 'https://www.instagram.com/a1.motor.park/'
  * scales linearly with offset, the vertical drop uses a slightly
  * super-linear curve (`|offset| ** 1.35`) so the spread reads more
  * like a curved arc than a straight slant.
+ *
+ * Hover behaviour (same pattern as Lando's site):
+ *   1. The hovered card lifts ~60 px up, fully straightens (rotate
+ *      lerped toward 0), scales to 1.08, and its shadow deepens.
+ *   2. All other cards dim to 55 % opacity while the fan is hovered,
+ *      so the focussed card pops even if it was half-covered by a
+ *      neighbour. Self-hover overrides the dim back to 100 %.
+ *   3. Transition uses a soft cubic-bezier so the lift has a small
+ *      overshoot / settle feel instead of a linear slide.
  */
 export function SocialFan() {
   const t = useTranslations('social')
@@ -36,7 +45,10 @@ export function SocialFan() {
         </h2>
       </div>
 
-      <div className="relative mt-10 md:mt-16 h-[380px] md:h-[520px] flex items-end justify-center">
+      {/* `group/fan` lets each FanCard ask "is ANY of my siblings
+          hovered?" via `group-hover/fan:*` utilities, so we can dim
+          the rest of the stack while the focussed card pops. */}
+      <div className="group/fan relative mt-10 md:mt-16 h-[380px] md:h-[520px] flex items-end justify-center">
         {socialPosts.map((post, i) => (
           <FanCard key={i} post={post} index={i} total={total} />
         ))}
@@ -74,29 +86,63 @@ function FanCard({
   const offset = index - (total - 1) / 2
   const abs = Math.abs(offset)
 
-  // Single transform numbers that read well at both the mobile
-  // (140 px card) and desktop (220 px card) sizes — the ratio of
-  // xShift to card width lands around 30 % in both cases, giving
-  // the same visual overlap density at either breakpoint.
+  // Resting pose — matches the Lando reference silhouette. xShift/yShift/
+  // rotate scale with `offset`, so the fan auto-adjusts if we ever change
+  // the number of posts.
   const rotate = offset * 8 // deg
   const xShift = offset * 52 // px — horizontal spread
   const yShift = Math.pow(abs, 1.35) * 12 // px — outer cards drop further
   const zIndex = 10 - Math.round(abs)
+
+  // Hover pose — lift the card clear of its neighbours, straighten the
+  // rotation to 0 (same as Lando's version), and scale up to 1.08 so it
+  // visibly grows even if another card was overlapping half of it.
+  const hoverYShift = -64 // lift 64 px above the resting baseline
+  const hoverRotate = 0 // fully straight on hover
+  const hoverScale = 1.08
 
   // Clicks gracefully fall back to the profile URL until a real
   // permalink is supplied.
   const href =
     post.permalink && post.permalink !== '#' ? post.permalink : IG_HREF
 
+  // Both poses live in CSS custom properties so the inline `transform`
+  // (which would otherwise override Tailwind's hover utilities) can
+  // swap them atomically via the `:hover` / `:focus-visible` pseudo-
+  // classes. Transition targets `transform`, `opacity`, and
+  // `box-shadow` together with a soft cubic-bezier for an elastic-
+  // looking settle.
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={post.alt}
-      className="absolute block w-[140px] md:w-[220px] aspect-[9/16] rounded-[22px] overflow-hidden ring-1 ring-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.5)] bg-[#0a0a0a] transition-transform duration-300 ease-out hover:z-50 hover:scale-[1.04] focus-visible:z-50 focus-visible:scale-[1.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+      className={[
+        'absolute block',
+        'w-[140px] md:w-[220px] aspect-[9/16]',
+        'rounded-[22px] overflow-hidden',
+        'ring-1 ring-white/10',
+        'shadow-[0_20px_40px_rgba(0,0,0,0.5)]',
+        'bg-[#0a0a0a]',
+        // Smooth cubic-bezier motion on all visual props at once.
+        'transition-[transform,box-shadow,opacity] duration-[400ms]',
+        '[transition-timing-function:cubic-bezier(.22,1,.36,1)]',
+        // Siblings fade when ANY card in the fan is hovered, so the
+        // focussed card pops against the rest of the stack.
+        'group-hover/fan:opacity-55',
+        // Self-hover / keyboard focus: cancel the dim, rise above
+        // every z-index, swap in the hover transform, deepen shadow.
+        'hover:!opacity-100 hover:z-50 hover:shadow-[0_34px_70px_rgba(0,0,0,0.65)]',
+        'hover:[transform:var(--fan-transform-hover)]',
+        'focus-visible:!opacity-100 focus-visible:z-50',
+        'focus-visible:[transform:var(--fan-transform-hover)]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+      ].join(' ')}
       style={{
-        transform: `translate(${xShift}px, ${yShift}px) rotate(${rotate}deg)`,
+        ['--fan-transform' as string]: `translate(${xShift}px, ${yShift}px) rotate(${rotate}deg)`,
+        ['--fan-transform-hover' as string]: `translate(${xShift}px, ${hoverYShift}px) rotate(${hoverRotate}deg) scale(${hoverScale})`,
+        transform: 'var(--fan-transform)',
         zIndex,
       }}
     >
