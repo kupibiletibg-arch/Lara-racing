@@ -65,7 +65,9 @@ export function SocialFan() {
       // `overflow-hidden` stops outer cards (which extend past the
       // section's content box on phones) from leaking into the
       // document and producing a horizontal scroll of the whole page.
-      className="relative mx-auto max-w-[1400px] px-5 md:px-8 py-16 md:py-24 border-t rule overflow-hidden"
+      // Reduced bottom padding closes the gap to the footer that the
+      // older `py-16 md:py-24` left behind.
+      className="relative mx-auto max-w-[1400px] px-5 md:px-8 pt-16 md:pt-24 pb-10 md:pb-14 border-t rule overflow-hidden"
     >
       <div className="text-center">
         <p className="telemetry mb-3">{t('kicker')}</p>
@@ -93,7 +95,9 @@ export function SocialFan() {
         ))}
       </div>
 
-      <div className="text-center mt-8 md:mt-12">
+      {/* Extra top margin so the rotating outer cards (which pivot
+          from their bottom-centres) don't reach down onto this copy. */}
+      <div className="text-center mt-16 md:mt-20">
         <p className="text-ink/75 text-[14px] md:text-[15px] mb-3">
           {t('subtitle')}
         </p>
@@ -129,15 +133,15 @@ function FanCard({
   const offset = index - (total - 1) / 2
   const abs = Math.abs(offset)
 
-  // Resting pose — matches the Lando reference silhouette. Mobile
-  // gets a tighter horizontal spread (and correspondingly smaller
-  // cards via the Tailwind `w-[120px]` class below) so the whole
-  // fan fits inside a 375 px viewport after the section's
-  // `overflow-hidden` clip.
+  // Resting pose — bottom edges of every card sit on the same
+  // baseline (yShift = 0) so nothing protrudes below the fan into
+  // the subtitle copy. The fan silhouette comes purely from the
+  // rotation + a bottom-centre pivot (see transform-origin in the
+  // className below), which makes the cards fan out like a real
+  // hand of playing cards.
   const rotate = offset * 8 // deg
   const xShiftMobile = offset * CARD_STEP_MOBILE
   const xShiftDesktop = offset * CARD_STEP_DESKTOP
-  const yShift = Math.pow(abs, 1.35) * 12 // px — outer cards drop further
   const baseZ = 10 - Math.round(abs)
 
   // Active pose — lift clear of the stack, straighten, scale up.
@@ -147,8 +151,8 @@ function FanCard({
 
   // Two transform pairs exposed as CSS custom properties; a Tailwind
   // `md:` utility below swaps which one is in use at the breakpoint.
-  const restingMobile = `translate(${xShiftMobile}px, ${yShift}px) rotate(${rotate}deg)`
-  const restingDesktop = `translate(${xShiftDesktop}px, ${yShift}px) rotate(${rotate}deg)`
+  const restingMobile = `translate(${xShiftMobile}px, 0) rotate(${rotate}deg)`
+  const restingDesktop = `translate(${xShiftDesktop}px, 0) rotate(${rotate}deg)`
   const liftedMobile = `translate(${xShiftMobile}px, ${activeYShift}px) rotate(${activeRotate}deg) scale(${activeScale})`
   const liftedDesktop = `translate(${xShiftDesktop}px, ${activeYShift}px) rotate(${activeRotate}deg) scale(${activeScale})`
 
@@ -173,6 +177,11 @@ function FanCard({
         'rounded-[22px] overflow-hidden',
         'ring-1 ring-white/10',
         'bg-[#0a0a0a]',
+        // Rotate around the bottom-centre so the fan pivots from the
+        // baseline — bottom edges stay roughly aligned while the tops
+        // of outer cards swing outward, no more dropping below into
+        // the subtitle.
+        'origin-bottom',
         // Unified transition for all the properties that change between
         // the resting and lifted poses. Cubic-bezier gives a soft
         // settle instead of a linear slide.
