@@ -65,9 +65,10 @@ export function SocialFan() {
       // `overflow-hidden` stops outer cards (which extend past the
       // section's content box on phones) from leaking into the
       // document and producing a horizontal scroll of the whole page.
-      // Reduced bottom padding closes the gap to the footer that the
-      // older `py-16 md:py-24` left behind.
-      className="relative mx-auto max-w-[1400px] px-5 md:px-8 pt-16 md:pt-24 pb-10 md:pb-14 border-t rule overflow-hidden"
+      // Mobile padding is much tighter than desktop because the fan
+      // is smaller on mobile and didn't need the full breathing room
+      // — keeps the home page flowing from section to section.
+      className="relative mx-auto max-w-[1400px] px-5 md:px-8 pt-10 md:pt-24 pb-6 md:pb-14 border-t rule overflow-hidden"
     >
       <div className="text-center">
         <p className="telemetry mb-3">{t('kicker')}</p>
@@ -81,7 +82,12 @@ export function SocialFan() {
         onPointerMove={(e) => pickActive(e.clientX)}
         onPointerLeave={clearActive}
         onPointerCancel={clearActive}
-        className="relative mt-10 md:mt-16 h-[380px] md:h-[520px] flex items-end justify-center touch-pan-y"
+        // Mobile card is 120 × 213 px; with a -64 px hover lift the
+        // fan only needs ~280 px of vertical room. The previous
+        // 380 px left 100 + px of dead black space above the cards on
+        // phones — trimmed to 300 px so the stack reads as a single
+        // compact block.
+        className="relative mt-6 md:mt-16 h-[300px] md:h-[520px] flex items-end justify-center touch-pan-y"
       >
         {socialPosts.map((post, i) => (
           <FanCard
@@ -96,8 +102,10 @@ export function SocialFan() {
       </div>
 
       {/* Extra top margin so the rotating outer cards (which pivot
-          from their bottom-centres) don't reach down onto this copy. */}
-      <div className="text-center mt-16 md:mt-20">
+          from their bottom-centres) don't reach down onto this copy.
+          Mobile uses a tighter cushion since the mobile fan is
+          smaller and doesn't need as much clearance. */}
+      <div className="text-center mt-8 md:mt-20">
         <p className="text-ink/75 text-[14px] md:text-[15px] mb-3">
           {t('subtitle')}
         </p>
