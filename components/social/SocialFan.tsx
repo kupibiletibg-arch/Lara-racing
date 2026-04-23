@@ -8,9 +8,13 @@ import { socialPosts, type SocialPost } from '@/lib/data/socialPosts'
 const IG_HREF = 'https://www.instagram.com/a1.motor.park/'
 
 // Horizontal distance (in px) between the resting centres of two
-// adjacent cards. Kept in module scope because both the FanCard
-// geometry and the pointer-to-index math need the same number.
-const CARD_STEP = 52
+// adjacent cards. Two values so the fan stays inside a phone's
+// viewport: mobile shrinks the spread; md+ keeps the original step.
+// The component reads the current breakpoint from the fan wrapper's
+// own width at pointer-move time, so the number below is only the
+// fallback used when the ref hasn't measured yet.
+const CARD_STEP_MOBILE = 40
+const CARD_STEP_DESKTOP = 52
 
 /**
  * "What's up on socials" — a fan-of-cards showcase styled after the
@@ -38,14 +42,17 @@ export function SocialFan() {
   const [activeIdx, setActiveIdx] = useState<number | null>(null)
 
   // Map a viewport X coordinate to the index of the card nearest to
-  // that position, or `null` when the pointer leaves the fan.
+  // that position, or `null` when the pointer leaves the fan. The
+  // per-breakpoint CARD_STEP mirrors the one baked into the <FanCard>
+  // inline transform so JS and CSS agree on where each card lives.
   const pickActive = (clientX: number) => {
     const el = fanRef.current
     if (!el) return
     const rect = el.getBoundingClientRect()
+    const step =
+      window.innerWidth >= 768 ? CARD_STEP_DESKTOP : CARD_STEP_MOBILE
     const relX = clientX - (rect.left + rect.width / 2)
-    // offset(i) = i - (total - 1) / 2, so i = offset + (total - 1) / 2
-    const rawIdx = Math.round(relX / CARD_STEP + (total - 1) / 2)
+    const rawIdx = Math.round(relX / step + (total - 1) / 2)
     const clamped = Math.max(0, Math.min(total - 1, rawIdx))
     setActiveIdx(clamped)
   }
@@ -55,7 +62,10 @@ export function SocialFan() {
   return (
     <section
       aria-label={t('title')}
-      className="mx-auto max-w-[1400px] px-5 md:px-8 py-16 md:py-24 border-t rule"
+      // `overflow-hidden` stops outer cards (which extend past the
+      // section's content box on phones) from leaking into the
+      // document and producing a horizontal scroll of the whole page.
+      className="relative mx-auto max-w-[1400px] px-5 md:px-8 py-16 md:py-24 border-t rule overflow-hidden"
     >
       <div className="text-center">
         <p className="telemetry mb-3">{t('kicker')}</p>
@@ -119,9 +129,14 @@ function FanCard({
   const offset = index - (total - 1) / 2
   const abs = Math.abs(offset)
 
-  // Resting pose — matches the Lando reference silhouette.
+  // Resting pose — matches the Lando reference silhouette. Mobile
+  // gets a tighter horizontal spread (and correspondingly smaller
+  // cards via the Tailwind `w-[120px]` class below) so the whole
+  // fan fits inside a 375 px viewport after the section's
+  // `overflow-hidden` clip.
   const rotate = offset * 8 // deg
-  const xShift = offset * CARD_STEP // px — horizontal spread
+  const xShiftMobile = offset * CARD_STEP_MOBILE
+  const xShiftDesktop = offset * CARD_STEP_DESKTOP
   const yShift = Math.pow(abs, 1.35) * 12 // px — outer cards drop further
   const baseZ = 10 - Math.round(abs)
 
@@ -130,8 +145,12 @@ function FanCard({
   const activeRotate = 0
   const activeScale = 1.08
 
-  const resting = `translate(${xShift}px, ${yShift}px) rotate(${rotate}deg)`
-  const lifted = `translate(${xShift}px, ${activeYShift}px) rotate(${activeRotate}deg) scale(${activeScale})`
+  // Two transform pairs exposed as CSS custom properties; a Tailwind
+  // `md:` utility below swaps which one is in use at the breakpoint.
+  const restingMobile = `translate(${xShiftMobile}px, ${yShift}px) rotate(${rotate}deg)`
+  const restingDesktop = `translate(${xShiftDesktop}px, ${yShift}px) rotate(${rotate}deg)`
+  const liftedMobile = `translate(${xShiftMobile}px, ${activeYShift}px) rotate(${activeRotate}deg) scale(${activeScale})`
+  const liftedDesktop = `translate(${xShiftDesktop}px, ${activeYShift}px) rotate(${activeRotate}deg) scale(${activeScale})`
 
   // Clicks gracefully fall back to the profile URL until a real
   // permalink is supplied.
@@ -147,7 +166,10 @@ function FanCard({
       aria-current={active || undefined}
       className={[
         'absolute block',
-        'w-[140px] md:w-[220px] aspect-[9/16]',
+        // Tighter card on mobile so six of them + the ±2.5 × 40 px
+        // spread fit comfortably inside the section's clipped 375 px
+        // viewport.
+        'w-[120px] md:w-[220px] aspect-[9/16]',
         'rounded-[22px] overflow-hidden',
         'ring-1 ring-white/10',
         'bg-[#0a0a0a]',
@@ -156,6 +178,11 @@ function FanCard({
         // settle instead of a linear slide.
         'transition-[transform,box-shadow,opacity] duration-[400ms]',
         '[transition-timing-function:cubic-bezier(.22,1,.36,1)]',
+        // Transform comes from CSS vars + Tailwind `md:` utility, so
+        // the breakpoint swap works without any inline-style override.
+        active
+          ? '[transform:var(--fan-lifted)] md:[transform:var(--fan-lifted-md)]'
+          : '[transform:var(--fan-resting)] md:[transform:var(--fan-resting-md)]',
         // Keyboard focus mirrors the pointer-active pose so keyboard
         // users get the same reveal.
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
@@ -167,7 +194,10 @@ function FanCard({
         anyActive && !active ? 'opacity-55' : 'opacity-100',
       ].join(' ')}
       style={{
-        transform: active ? lifted : resting,
+        ['--fan-resting' as string]: restingMobile,
+        ['--fan-resting-md' as string]: restingDesktop,
+        ['--fan-lifted' as string]: liftedMobile,
+        ['--fan-lifted-md' as string]: liftedDesktop,
         // Lifted card always tops every neighbour; resting cards keep
         // their natural stack order based on distance from centre.
         zIndex: active ? 50 : baseZ,
