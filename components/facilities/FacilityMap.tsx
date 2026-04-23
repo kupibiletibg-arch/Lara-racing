@@ -1,108 +1,29 @@
-'use client'
-
-import { useLocale } from 'next-intl'
-import { facilities } from '@/lib/data/facilities'
-import { trackPath, pitPath, trackViewBox } from '@/lib/data/track'
+import Image from 'next/image'
+import { getTranslations } from 'next-intl/server'
 
 /**
- * Landscape facility map. The track is drawn once with pit lane + white
- * terrain outline, and 14 numbered red POI circles sit on top at positions
- * taken from the reference image.
+ * Facility schema. Renders the client-supplied raster schema image
+ * ("Схема съоръжения А1 мотор парк.png") — numbered POIs, track
+ * outline, labels and all — exactly as delivered, inside a framed
+ * container that matches the site's section scaffold. The numbered
+ * legend beside this map on /facilities is driven by the same
+ * `facilities` data file so id ↔ label stays in sync with the
+ * visible schema.
  */
-export function FacilityMap() {
-  const locale = useLocale()
-  const { x, y, w, h } = trackViewBox
-
-  // POI layer uses a 0..1000 × 0..800 viewBox so positions read as percentages.
-  const POI_W = 1000
-  const POI_H = 800
-
+export async function FacilityMap() {
+  const t = await getTranslations('facilities')
   return (
-    <div className="relative aspect-[5/3] md:aspect-[16/10] w-full overflow-hidden border rule bg-bg">
-      {/* track underlay */}
-      <svg
-        viewBox={`${x} ${y} ${w} ${h}`}
-        preserveAspectRatio="xMidYMid meet"
-        className="absolute inset-0 w-full h-full"
-        fill="none"
-        aria-hidden
-        style={{ transform: 'rotate(90deg) scale(1.15)' }}
-      >
-        <path
-          d={trackPath}
-          stroke="var(--line)"
-          strokeOpacity="0.15"
-          strokeWidth="22"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
+    <figure className="relative w-full overflow-hidden border rule bg-bg">
+      <div className="relative aspect-[18/10] w-full">
+        <Image
+          src="/facilities/schema.webp"
+          alt={t('title')}
+          fill
+          sizes="(max-width: 1024px) 100vw, 60vw"
+          priority={false}
+          className="object-contain"
         />
-        <path
-          d={pitPath}
-          stroke="var(--line)"
-          strokeOpacity="0.3"
-          strokeWidth="1.5"
-          strokeDasharray="5 5"
-          vectorEffect="non-scaling-stroke"
-        />
-        <path
-          d={trackPath}
-          stroke="var(--brand)"
-          strokeWidth="3"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-
-      {/* POI overlay */}
-      <svg
-        viewBox={`0 0 ${POI_W} ${POI_H}`}
-        preserveAspectRatio="xMidYMid meet"
-        className="absolute inset-0 w-full h-full"
-        fill="none"
-      >
-        {facilities.map(f => {
-          const cx = f.x * POI_W
-          const cy = f.y * POI_H
-          const label = locale === 'bg' ? f.labelBg : f.labelEn
-          return (
-            <g key={f.id} className="group cursor-help">
-              <circle
-                cx={cx}
-                cy={cy}
-                r={18}
-                fill="var(--brand)"
-                stroke="var(--ink)"
-                strokeWidth="1.5"
-                className="transition-transform"
-                style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
-              />
-              <circle
-                cx={cx}
-                cy={cy}
-                r={28}
-                fill="var(--brand)"
-                fillOpacity="0"
-                className="group-hover:fill-opacity-20 transition-[fill-opacity]"
-              />
-              <text
-                x={cx}
-                y={cy}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fill="var(--ink)"
-                fontFamily="var(--font-mono), monospace"
-                fontWeight={700}
-                fontSize={13}
-              >
-                {f.id}
-              </text>
-              <title>{label}</title>
-            </g>
-          )
-        })}
-      </svg>
-    </div>
+      </div>
+    </figure>
   )
 }
