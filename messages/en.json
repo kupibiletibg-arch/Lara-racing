@@ -129,5 +129,11 @@
     "switchTo": "Български",
     "loading": "Loading…",
     "backToTop": "Back to top"
+  },
+  "social": {
+    "kicker": "SOCIAL",
+    "title": "What's up on socials",
+    "subtitle": "Follow A1 Motor Park",
+    "cta": "@a1.motor.park"
   }
 }

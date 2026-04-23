@@ -5,6 +5,7 @@ import { TrackHero } from '@/components/track/TrackHero'
 import { ScrollElevationBar } from '@/components/track/ScrollElevationBar'
 import { EventsHero } from '@/components/calendar/EventsHero'
 import { FacilityMap } from '@/components/facilities/FacilityMap'
+import { SocialFan } from '@/components/social/SocialFan'
 import { trackMeta } from '@/lib/data/track'
 
 export default async function Home({ params }: { params: { locale: string } }) {
@@ -62,6 +63,8 @@ export default async function Home({ params }: { params: { locale: string } }) {
           </figure>
         </div>
       </section>
+
+      <SocialFan />
     </>
   )
 }

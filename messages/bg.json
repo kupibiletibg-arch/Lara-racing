@@ -129,5 +129,11 @@
     "switchTo": "English",
     "loading": "Зарежда…",
     "backToTop": "Нагоре"
+  },
+  "social": {
+    "kicker": "СОЦИАЛНИ МРЕЖИ",
+    "title": "Какво става в социалните ни мрежи",
+    "subtitle": "Последвай A1 Motor Park",
+    "cta": "@a1.motor.park"
   }
 }
