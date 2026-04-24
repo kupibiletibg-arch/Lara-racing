@@ -38,7 +38,7 @@ export async function EventsHero() {
         {/* LEFT — hero copy */}
         <div className="relative flex items-center">
           <Image
-            src="/events/premium-rally-2026-05.webp"
+            src="/events/events-hero-bg.webp"
             alt=""
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
