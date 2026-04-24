@@ -58,7 +58,10 @@ export async function EventsHero() {
           />
           <div
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-r from-bg via-bg/90 to-bg/60"
+            // Left-side-only darkening: solid near the title, fading to
+            // fully transparent over the right half so the underlying
+            // photo stays bright where it doesn't compete with the copy.
+            className="absolute inset-0 bg-gradient-to-r from-bg via-bg/80 to-transparent"
           />
           <div className="relative z-10 px-6 md:px-10 lg:px-14 py-12 md:py-16 lg:py-20 max-w-xl">
             <p className="telemetry mb-3">{t('kicker')}</p>
@@ -101,12 +104,11 @@ export async function EventsHero() {
                 />
                 <div
                   aria-hidden
-                  // Matches the left-hero overlay so every right-column
-                  // tile shares the same dark-on-the-left falloff.
-                  // Hover lifts the whole ramp a notch so the image
-                  // reads slightly brighter without losing the
-                  // darkened copy area on the left edge.
-                  className="absolute inset-0 bg-gradient-to-r from-bg via-bg/90 to-bg/60 group-hover:from-bg/90 group-hover:via-bg/75 group-hover:to-bg/45 transition-colors"
+                  // Same dark-on-left, transparent-on-right falloff as
+                  // the left hero — the copy stays legible while the
+                  // photo reads clearly from the middle onwards. Hover
+                  // softens the left edge so the image breathes more.
+                  className="absolute inset-0 bg-gradient-to-r from-bg/90 via-bg/45 to-transparent group-hover:from-bg/75 group-hover:via-bg/30 transition-colors"
                 />
                 <div className="relative z-10 flex h-full items-center justify-between gap-4 px-6 md:px-8 py-6 md:py-8">
                   <div className="min-w-0">
