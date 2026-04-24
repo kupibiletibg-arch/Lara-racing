@@ -131,7 +131,7 @@ export function EventsCatalog({ events }: Props) {
 
   return (
     <div>
-      <div className="sticky top-24 md:top-28 z-20 -mx-5 md:-mx-8 px-5 md:px-8 py-4 md:py-5 mb-8 md:mb-12 bg-bg/80 backdrop-blur-md border-b rule">
+      <div className="sticky top-20 md:top-28 z-20 -mx-5 md:-mx-8 px-5 md:px-8 py-4 md:py-5 mb-8 md:mb-12 bg-bg/80 backdrop-blur-md border-b rule">
         <FilterRow label={t('filters.category')}>
           <CategoryChips
             ariaLabel={t('filters.category')}

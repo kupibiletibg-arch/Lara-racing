@@ -151,8 +151,8 @@ export function Header() {
 
   return (
     <>
-    <header className="sticky top-0 z-40 backdrop-blur-md bg-bg/70 border-b rule">
-      <div className="relative w-full px-2 md:px-3 h-24 md:h-28 flex items-center justify-between">
+    <header className="sticky top-0 z-40 backdrop-blur-xl bg-[rgba(5,5,5,0.88)] supports-[backdrop-filter]:bg-[rgba(5,5,5,0.72)] border-b rule shadow-[0_1px_0_0_rgba(242,237,228,0.04)]">
+      <div className="relative w-full px-2 md:px-3 h-20 md:h-28 flex items-center justify-between">
         <Link
           href={`/${locale}`}
           className="flex items-center hover:opacity-90 transition-opacity"
@@ -267,6 +267,7 @@ export function Header() {
 
           <Link
             href={altHref}
+            prefetch={false}
             aria-label={`Switch to ${altLocale.toUpperCase()}`}
             className="inline-flex items-center gap-2 font-mono tracking-mono uppercase text-[14px] text-ink/60 hover:text-ink transition-colors px-1 py-1"
           >
@@ -326,7 +327,7 @@ export function Header() {
     <div
       id="mobile-nav"
       className={clsx(
-        'lg:hidden fixed inset-x-0 bottom-0 top-24 z-30 transition-opacity duration-200 overflow-y-auto',
+        'lg:hidden fixed inset-x-0 bottom-0 top-20 z-30 transition-opacity duration-200 overflow-y-auto',
         menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
       )}
       style={{

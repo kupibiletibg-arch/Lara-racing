@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { trackMeta } from '@/lib/data/track'
 
@@ -10,10 +11,50 @@ import { trackMeta } from '@/lib/data/track'
  * standalone Three.js bundle shipped as /public/a1-track/index.html (matcap
  * at /public/vendor/matcap_red.png), so we embed it via an iframe — no Three
  * or GSAP is needed on the React side.
+ *
+ * The iframe only mounts after the intro overlay dismisses (signalled via a
+ * window `a1-ready` event) or after a short idle fallback — this keeps the
+ * main thread free during the preloader moment and avoids competing for
+ * network bandwidth with the intro video.
  */
 export function TrackHero() {
   const t = useTranslations('hero')
   const locale = useLocale()
+  const [mountIframe, setMountIframe] = useState(false)
+
+  useEffect(() => {
+    // Already signalled (e.g. user navigated back to home after intro)?
+    if (
+      typeof window !== 'undefined' &&
+      (window as unknown as { __a1Ready?: boolean }).__a1Ready
+    ) {
+      setMountIframe(true)
+      return
+    }
+    const onReady = () => setMountIframe(true)
+    window.addEventListener('a1-ready', onReady, { once: true })
+    // Fallback: if no intro was shown (?skipIntro=1 or sessionStorage
+    // flag already set), idle-mount the iframe so the hero still works.
+    type RIC = (cb: () => void, opts?: { timeout: number }) => number
+    type CIC = (id: number) => void
+    const ric = (window as unknown as { requestIdleCallback?: RIC })
+      .requestIdleCallback
+    const cic = (window as unknown as { cancelIdleCallback?: CIC })
+      .cancelIdleCallback
+    const idleId: number = ric
+      ? ric(() => setMountIframe(true), { timeout: 2500 })
+      : (window.setTimeout(() => setMountIframe(true), 1500) as unknown as number)
+    return () => {
+      window.removeEventListener('a1-ready', onReady)
+      if (cic) {
+        try {
+          cic(idleId)
+        } catch {}
+      } else {
+        window.clearTimeout(idleId)
+      }
+    }
+  }, [])
 
   return (
     <section className="relative" aria-label="A1 Motor Park hero">
@@ -40,14 +81,23 @@ export function TrackHero() {
               <Crosshair className="bottom-0 left-0 -rotate-90" />
               <Crosshair className="bottom-0 right-0 rotate-180" />
 
-              <iframe
-                src="/a1-track/index.html"
-                title="A1 Motor Park — 3D circuit"
-                loading="eager"
-                scrolling="no"
-                allow="fullscreen"
-                className="absolute inset-0 w-full h-full border-0 bg-transparent"
-              />
+              {mountIframe ? (
+                <iframe
+                  src="/a1-track/index.html"
+                  title="A1 Motor Park — 3D circuit"
+                  loading="lazy"
+                  scrolling="no"
+                  allow="fullscreen"
+                  className="absolute inset-0 w-full h-full border-0 bg-transparent animate-[fadeIn_600ms_ease-out]"
+                />
+              ) : (
+                <div
+                  aria-hidden
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <div className="h-14 w-14 rounded-full border border-ink/10 border-t-brand animate-spin" />
+                </div>
+              )}
             </div>
           </div>
 

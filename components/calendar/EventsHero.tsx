@@ -52,6 +52,7 @@ export async function EventsHero() {
             alt=""
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
+            quality={55}
             className="object-cover opacity-35"
             aria-hidden
           />
@@ -89,6 +90,7 @@ export async function EventsHero() {
                   alt=""
                   fill
                   sizes="(min-width: 1024px) 50vw, 100vw"
+                  quality={70}
                   className="object-cover opacity-55 group-hover:opacity-75 transition-opacity duration-300"
                   style={
                     c.objectPosition
