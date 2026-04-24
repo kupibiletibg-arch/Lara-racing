@@ -86,6 +86,10 @@ export function Header() {
   const locale = useLocale()
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
+  // Which nav parent is currently expanded inside the mobile overlay.
+  // Drives the collapsible drop-down that replaces the old always-
+  // visible indented children list.
+  const [expandedHref, setExpandedHref] = useState<string | null>(null)
 
   const altLocale = locales.find(l => l !== locale) ?? 'en'
   const pathnameWithoutLocale = pathname.replace(new RegExp(`^/${locale}`), '') || '/'
@@ -125,8 +129,11 @@ export function Header() {
       : pathname === l.href || pathname.startsWith(`${l.href}/`)
 
   // Close on route change + lock page scroll while open + ESC to close.
+  // Collapse any expanded sub-section with the close so the menu
+  // re-opens fresh (not stuck halfway through a previous expansion).
   useEffect(() => {
     setMenuOpen(false)
+    setExpandedHref(null)
   }, [pathname])
 
   useEffect(() => {
@@ -332,37 +339,85 @@ export function Header() {
       <nav className="flex flex-col gap-1 px-5 py-8">
         {links.map(l => {
           const active = isActive(l)
+          const hasChildren = Boolean(l.children?.length)
+          const expanded = expandedHref === l.href
+
+          // Parent row: the label itself is still a Link that goes to
+          // the parent's landing page; the trailing chevron is a
+          // separate toggle that expands/collapses the children
+          // without navigating. That way the landing page stays one
+          // tap away, and the sub-items are one tap behind the
+          // chevron — no double-duty on the same target.
           return (
             <Fragment key={l.href}>
-              <Link
-                href={l.href}
-                onClick={() => setMenuOpen(false)}
-                className={clsx(
-                  'font-display font-medium text-[22px] py-3 px-1 border-b rule transition-colors',
-                  active ? 'text-brand' : 'text-ink/85 hover:text-ink',
-                )}
-              >
-                {l.label}
-              </Link>
-              {l.children?.map(c => {
-                const cActive = isActive(c)
-                return (
-                  <Link
-                    key={c.href}
-                    href={c.href}
-                    onClick={() => setMenuOpen(false)}
-                    className={clsx(
-                      // Indented + smaller so children read as a
-                      // nested group under their parent without
-                      // needing a separate collapsible drawer.
-                      'font-display font-medium text-[18px] py-2.5 pl-6 pr-1 border-b rule transition-colors',
-                      cActive ? 'text-brand' : 'text-ink/70 hover:text-ink',
-                    )}
+              <div className="flex items-stretch border-b rule">
+                <Link
+                  href={l.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={clsx(
+                    'flex-1 font-display font-medium text-[22px] py-3 px-1 transition-colors',
+                    active ? 'text-brand' : 'text-ink/85 hover:text-ink',
+                  )}
+                >
+                  {l.label}
+                </Link>
+                {hasChildren && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setExpandedHref(expanded ? null : l.href)
+                    }
+                    aria-expanded={expanded}
+                    aria-controls={`mobile-sub-${l.href}`}
+                    aria-label={`${expanded ? 'Collapse' : 'Expand'} ${l.label}`}
+                    className="px-3 inline-flex items-center justify-center text-ink/55 hover:text-ink transition-colors"
                   >
-                    · {c.label}
-                  </Link>
-                )
-              })}
+                    <ChevronDown
+                      className={clsx(
+                        'h-4 w-4 transition-transform duration-200',
+                        expanded && 'rotate-180',
+                      )}
+                    />
+                  </button>
+                )}
+              </div>
+
+              {hasChildren && (
+                <div
+                  id={`mobile-sub-${l.href}`}
+                  className={clsx(
+                    // Grid-rows trick for a smooth open/close animation
+                    // on content with unknown intrinsic height. The
+                    // inner wrapper needs `overflow-hidden` + min-h-0
+                    // for the 0fr/1fr interpolation to clip correctly.
+                    'grid transition-[grid-template-rows,opacity] duration-300 ease-out',
+                    expanded
+                      ? 'grid-rows-[1fr] opacity-100'
+                      : 'grid-rows-[0fr] opacity-0 pointer-events-none',
+                  )}
+                >
+                  <div className="min-h-0 overflow-hidden">
+                    {l.children?.map(c => {
+                      const cActive = isActive(c)
+                      return (
+                        <Link
+                          key={c.href}
+                          href={c.href}
+                          onClick={() => setMenuOpen(false)}
+                          className={clsx(
+                            'block font-display font-medium text-[18px] py-2.5 pl-6 pr-1 border-b rule transition-colors',
+                            cActive
+                              ? 'text-brand'
+                              : 'text-ink/70 hover:text-ink',
+                          )}
+                        >
+                          · {c.label}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </Fragment>
           )
         })}
