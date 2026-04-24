@@ -95,7 +95,12 @@ export async function EventsHero() {
                 />
                 <div
                   aria-hidden
-                  className="absolute inset-0 bg-gradient-to-r from-bg/85 via-bg/40 to-transparent group-hover:from-bg/75 transition-colors"
+                  // Matches the left-hero overlay so every right-column
+                  // tile shares the same dark-on-the-left falloff.
+                  // Hover lifts the whole ramp a notch so the image
+                  // reads slightly brighter without losing the
+                  // darkened copy area on the left edge.
+                  className="absolute inset-0 bg-gradient-to-r from-bg via-bg/90 to-bg/60 group-hover:from-bg/90 group-hover:via-bg/75 group-hover:to-bg/45 transition-colors"
                 />
                 <div className="relative z-10 flex h-full items-center justify-between gap-4 px-6 md:px-8 py-6 md:py-8">
                   <div className="min-w-0">
