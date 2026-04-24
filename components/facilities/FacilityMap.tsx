@@ -13,17 +13,19 @@ import { getTranslations } from 'next-intl/server'
 export async function FacilityMap() {
   const t = await getTranslations('facilities')
   return (
+    // No fixed-aspect wrapper: the image sizes itself (width/height props
+    // lock its intrinsic ratio via next/image) so the figure hugs the
+    // schema exactly — no letterbox bars above or below.
     <figure className="relative w-full overflow-hidden border rule bg-bg">
-      <div className="relative aspect-[18/10] w-full">
-        <Image
-          src="/facilities/schema.webp"
-          alt={t('title')}
-          fill
-          sizes="(max-width: 1024px) 100vw, 60vw"
-          priority={false}
-          className="object-contain"
-        />
-      </div>
+      <Image
+        src="/facilities/schema.webp"
+        alt={t('title')}
+        width={3600}
+        height={1780}
+        sizes="(max-width: 1024px) 100vw, 60vw"
+        priority={false}
+        className="block w-full h-auto"
+      />
     </figure>
   )
 }
