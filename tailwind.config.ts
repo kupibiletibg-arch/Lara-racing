@@ -9,13 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: 'var(--bg)',
-        ink: 'var(--ink)',
-        line: 'var(--line)',
-        brand: 'var(--brand)',
-        'brand-deep': 'var(--brand-deep)',
-        data: 'var(--data)',
-        muted: 'var(--muted)',
+        // Use RGB channel vars so Tailwind's `bg-bg/70` opacity modifier
+        // actually compiles (it needs to split the color into channels to
+        // apply the alpha). The legacy hex vars in :root are kept for
+        // components that still use them directly.
+        bg: 'rgb(var(--bg-rgb) / <alpha-value>)',
+        ink: 'rgb(var(--ink-rgb) / <alpha-value>)',
+        line: 'rgb(var(--ink-rgb) / <alpha-value>)',
+        brand: 'rgb(var(--brand-rgb) / <alpha-value>)',
+        'brand-deep': 'rgb(var(--brand-deep-rgb) / <alpha-value>)',
+        data: 'rgb(var(--data-rgb) / <alpha-value>)',
+        muted: 'rgb(var(--muted-rgb) / <alpha-value>)',
       },
       fontFamily: {
         display: ['var(--font-display)', 'ui-serif', 'Georgia', 'serif'],
