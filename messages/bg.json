@@ -4,9 +4,20 @@
     "calendar": "Календар",
     "track": "Пистата",
     "facilities": "Съоръжения",
+    "experiences": "Преживявания",
+    "experiencesHotLaps": "Горещи обиколки",
+    "experiencesAcademy": "Академия",
     "partners": "Партньори",
     "about": "За нас",
-    "contact": "Контакт"
+    "contact": "Контакт",
+    "shop": "Магазин",
+    "cart": "Количка"
+  },
+  "comingSoon": {
+    "kicker": "ОЧАКВАЙТЕ СКОРО",
+    "title": "Очаквайте скоро",
+    "body": "Подготвяме тази секция — ще бъде достъпна съвсем скоро.",
+    "back": "Обратно към началото"
   },
   "hero": {
     "kicker": "БЪЛГАРСКА FIA GRADE 3 ПИСТА",

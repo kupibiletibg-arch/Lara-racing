@@ -4,9 +4,20 @@
     "calendar": "Calendar",
     "track": "Track",
     "facilities": "Facilities",
+    "experiences": "Experiences",
+    "experiencesHotLaps": "Hot laps",
+    "experiencesAcademy": "Academy",
     "partners": "Partners",
     "about": "About",
-    "contact": "Contact"
+    "contact": "Contact",
+    "shop": "Shop",
+    "cart": "Cart"
+  },
+  "comingSoon": {
+    "kicker": "COMING SOON",
+    "title": "Coming soon",
+    "body": "We're preparing this section — it will be available shortly.",
+    "back": "Back to home"
   },
   "hero": {
     "kicker": "BULGARIA'S FIA GRADE 3 CIRCUIT",

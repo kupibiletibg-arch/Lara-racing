@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
@@ -35,8 +35,51 @@ function FacebookIcon({ className = 'h-[18px] w-[18px]' }: { className?: string 
   )
 }
 
+function CartIcon({ className = 'h-[18px] w-[18px]' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M3 4h2l2.4 11.5a2 2 0 0 0 2 1.5h7.8a2 2 0 0 0 2-1.5L21 7H6" />
+      <circle cx="9" cy="20" r="1.4" />
+      <circle cx="18" cy="20" r="1.4" />
+    </svg>
+  )
+}
+
+function ChevronDown({ className = 'h-3 w-3' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  )
+}
+
 const IG_HREF = 'https://www.instagram.com/a1.motor.park/'
 const FB_HREF = 'https://www.facebook.com/A1.Motor.Park/'
+
+type NavLink = {
+  href: string
+  label: string
+  exact?: boolean
+  children?: NavLink[]
+}
 
 export function Header() {
   const t = useTranslations('nav')
@@ -48,15 +91,38 @@ export function Header() {
   const pathnameWithoutLocale = pathname.replace(new RegExp(`^/${locale}`), '') || '/'
   const altHref = `/${altLocale}${pathnameWithoutLocale === '/' ? '' : pathnameWithoutLocale}`
 
-  const links = [
+  // Top-level nav tree. When a link carries `children` it renders as a
+  // desktop hover dropdown and as indented sub-rows inside the mobile
+  // overlay. No new drawer UX on mobile — children are just shown
+  // beneath their parent with a hair smaller type + left indent, which
+  // keeps the menu scannable without adding a tap target to expand.
+  const links: NavLink[] = [
     { href: `/${locale}`, label: t('home'), exact: true },
     { href: `/${locale}/calendar`, label: t('calendar') },
     { href: `/${locale}/track`, label: t('track') },
     { href: `/${locale}/facilities`, label: t('facilities') },
+    {
+      href: `/${locale}/experiences`,
+      label: t('experiences'),
+      children: [
+        { href: `/${locale}/experiences/hot-laps`, label: t('experiencesHotLaps') },
+        { href: `/${locale}/experiences/academy`, label: t('experiencesAcademy') },
+      ],
+    },
     { href: `/${locale}/partners`, label: t('partners') },
     { href: `/${locale}/about`, label: t('about') },
     { href: `/${locale}/contact`, label: t('contact') },
+    { href: `/${locale}/shop`, label: t('shop') },
   ]
+
+  // Cart button points at the shop stub for now. When the shop ships
+  // we'll swap this to `/shop/cart` (or wire it to a slide-over).
+  const cartHref = `/${locale}/shop`
+
+  const isActive = (l: NavLink) =>
+    l.exact
+      ? pathname === l.href
+      : pathname === l.href || pathname.startsWith(`${l.href}/`)
 
   // Close on route change + lock page scroll while open + ESC to close.
   useEffect(() => {
@@ -90,7 +156,58 @@ export function Header() {
 
         <nav className="absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-1 text-[13px] font-mono tracking-mono uppercase">
           {links.slice(1).map(l => {
-            const active = pathname === l.href || pathname.startsWith(`${l.href}/`)
+            const active = isActive(l)
+
+            if (l.children) {
+              return (
+                <div key={l.href} className="relative group">
+                  <Link
+                    href={l.href}
+                    className={clsx(
+                      'px-3 py-2 transition-colors relative inline-flex items-center gap-1.5',
+                      active ? 'text-brand' : 'text-ink/70 hover:text-ink',
+                    )}
+                    aria-haspopup="true"
+                  >
+                    {l.label}
+                    <ChevronDown className="h-3 w-3 opacity-70 transition-transform group-hover:rotate-180" />
+                    {active && (
+                      <span className="absolute left-3 right-3 bottom-1 h-px bg-brand" />
+                    )}
+                  </Link>
+
+                  {/* Dropdown panel. `pt-2` on the wrapper bridges the
+                      gap below the parent label so mouse hover doesn't
+                      drop as the cursor moves from parent to items. */}
+                  <div
+                    className="absolute left-0 top-full pt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto focus-within:opacity-100 focus-within:pointer-events-auto transition-opacity duration-150"
+                    role="menu"
+                  >
+                    <div className="min-w-[200px] bg-bg/95 backdrop-blur-md border rule py-2 shadow-[0_20px_40px_rgba(0,0,0,0.45)]">
+                      {l.children.map(c => {
+                        const cActive = isActive(c)
+                        return (
+                          <Link
+                            key={c.href}
+                            href={c.href}
+                            role="menuitem"
+                            className={clsx(
+                              'block px-4 py-2 transition-colors',
+                              cActive
+                                ? 'text-brand'
+                                : 'text-ink/75 hover:text-ink hover:bg-ink/5',
+                            )}
+                          >
+                            {c.label}
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )
+            }
+
             return (
               <Link
                 key={l.href}
@@ -129,6 +246,17 @@ export function Header() {
           >
             <FacebookIcon className="h-[18px] w-[18px]" />
           </a>
+
+          {/* Cart — visible at every breakpoint; links to the shop
+              stub for now. When cart state ships this is where the
+              item-count badge will live. */}
+          <Link
+            href={cartHref}
+            aria-label={t('cart')}
+            className="inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 text-ink/70 hover:text-ink transition-colors"
+          >
+            <CartIcon className="h-[20px] w-[20px] md:h-[22px] md:w-[22px]" />
+          </Link>
 
           <Link
             href={altHref}
@@ -191,7 +319,7 @@ export function Header() {
     <div
       id="mobile-nav"
       className={clsx(
-        'lg:hidden fixed inset-x-0 bottom-0 top-24 z-30 transition-opacity duration-200',
+        'lg:hidden fixed inset-x-0 bottom-0 top-24 z-30 transition-opacity duration-200 overflow-y-auto',
         menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
       )}
       style={{
@@ -203,22 +331,39 @@ export function Header() {
     >
       <nav className="flex flex-col gap-1 px-5 py-8">
         {links.map(l => {
-          const active =
-            l.exact
-              ? pathname === l.href
-              : pathname === l.href || pathname.startsWith(`${l.href}/`)
+          const active = isActive(l)
           return (
-            <Link
-              key={l.href}
-              href={l.href}
-              onClick={() => setMenuOpen(false)}
-              className={clsx(
-                'font-display font-medium text-[22px] py-3 px-1 border-b rule transition-colors',
-                active ? 'text-brand' : 'text-ink/85 hover:text-ink',
-              )}
-            >
-              {l.label}
-            </Link>
+            <Fragment key={l.href}>
+              <Link
+                href={l.href}
+                onClick={() => setMenuOpen(false)}
+                className={clsx(
+                  'font-display font-medium text-[22px] py-3 px-1 border-b rule transition-colors',
+                  active ? 'text-brand' : 'text-ink/85 hover:text-ink',
+                )}
+              >
+                {l.label}
+              </Link>
+              {l.children?.map(c => {
+                const cActive = isActive(c)
+                return (
+                  <Link
+                    key={c.href}
+                    href={c.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={clsx(
+                      // Indented + smaller so children read as a
+                      // nested group under their parent without
+                      // needing a separate collapsible drawer.
+                      'font-display font-medium text-[18px] py-2.5 pl-6 pr-1 border-b rule transition-colors',
+                      cActive ? 'text-brand' : 'text-ink/70 hover:text-ink',
+                    )}
+                  >
+                    · {c.label}
+                  </Link>
+                )
+              })}
+            </Fragment>
           )
         })}
         <div className="flex items-center justify-center gap-8 pt-8">
