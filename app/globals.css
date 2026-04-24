@@ -36,38 +36,15 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  /*
-   * Start/finish checker pattern, tuned to the same ~0.02 ink alpha
-   * as the previous concentric-rings design so it stays barely-there
-   * texture, not decoration that competes with the foreground.
-   *
-   * The two 45° gradients, offset by half a cell on both axes,
-   * produce the classic chequerboard without a bitmap asset. Cell
-   * size 52 px reads as "racing flag" on desktop + mobile without
-   * feeling busy.
-   */
-  --flag-alpha: 0.02;
-  --flag-cell: 52px;
   background-image:
-    linear-gradient(
-      45deg,
-      rgba(242, 237, 228, var(--flag-alpha)) 25%,
-      transparent 25%,
-      transparent 75%,
-      rgba(242, 237, 228, var(--flag-alpha)) 75%
-    ),
-    linear-gradient(
-      45deg,
-      rgba(242, 237, 228, var(--flag-alpha)) 25%,
-      transparent 25%,
-      transparent 75%,
-      rgba(242, 237, 228, var(--flag-alpha)) 75%
-    ),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent 6%, rgba(242, 237, 228, 0.02) 6.1%, rgba(242, 237, 228, 0.02) 6.4%, transparent 6.5%),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent 12%, rgba(242, 237, 228, 0.025) 12.1%, rgba(242, 237, 228, 0.025) 12.4%, transparent 12.5%),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent 20%, rgba(242, 237, 228, 0.02) 20.1%, rgba(242, 237, 228, 0.02) 20.4%, transparent 20.5%),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent 30%, rgba(242, 237, 228, 0.022) 30.1%, rgba(242, 237, 228, 0.022) 30.4%, transparent 30.5%),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent 42%, rgba(242, 237, 228, 0.02) 42.1%, rgba(242, 237, 228, 0.02) 42.4%, transparent 42.5%),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent 56%, rgba(242, 237, 228, 0.02) 56.1%, rgba(242, 237, 228, 0.02) 56.4%, transparent 56.5%),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent 72%, rgba(242, 237, 228, 0.02) 72.1%, rgba(242, 237, 228, 0.02) 72.4%, transparent 72.5%),
     linear-gradient(180deg, #070706 0%, #050505 60%, #030303 100%);
-  background-size: var(--flag-cell) var(--flag-cell),
-    var(--flag-cell) var(--flag-cell), auto auto;
-  background-position: 0 0,
-    calc(var(--flag-cell) / 2) calc(var(--flag-cell) / 2), 0 0;
 }
 
 /* 2% film grain via SVG data URI — no extra request. */
