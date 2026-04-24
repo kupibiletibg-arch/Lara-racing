@@ -24,14 +24,23 @@ import { Logo } from '@/components/brand/Logo'
 
 type Stage = 'on' | 'fade' | 'off'
 
-// Lives in module scope — resets only on a real page reload / fresh tab.
-// Keeps the intro from replaying on client-side navigation (menu → menu,
-// locale switch BG ↔ EN) while still firing on the initial visit and on
-// hard refresh.
-let introPlayed = false
+// The "already played" flag lives on `window` instead of module scope.
+// The window object is shared across every client-side navigation (same
+// tab) and is only replaced on a real page lifecycle — initial load,
+// hard refresh, or a new tab. This matters on mobile in particular,
+// where some route transitions (e.g. tapping a link inside a sheet
+// that also mutates body.overflow) appeared to remount the component
+// tree in a way that reset a plain module-level `let`.
+const PLAYED_KEY = '__a1IntroPlayed'
+type IntroWindow = Window & { [PLAYED_KEY]?: boolean }
+const getPlayed = () =>
+  typeof window !== 'undefined' && Boolean((window as IntroWindow)[PLAYED_KEY])
+const markPlayed = () => {
+  if (typeof window !== 'undefined') (window as IntroWindow)[PLAYED_KEY] = true
+}
 
 export function LoadingScreen() {
-  const [stage, setStage] = useState<Stage>(() => (introPlayed ? 'off' : 'on'))
+  const [stage, setStage] = useState<Stage>(() => (getPlayed() ? 'off' : 'on'))
   const [settled, setSettled] = useState(false)
   const [reduced, setReduced] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -40,11 +49,11 @@ export function LoadingScreen() {
   useEffect(() => {
     // Already played in this page lifetime — skip the sequence but still
     // notify downstream listeners that the page is ready to animate.
-    if (introPlayed) {
+    if (getPlayed()) {
       window.dispatchEvent(new CustomEvent('a1-ready'))
       return
     }
-    introPlayed = true
+    markPlayed()
 
     const prefersReduced =
       typeof window !== 'undefined' &&
