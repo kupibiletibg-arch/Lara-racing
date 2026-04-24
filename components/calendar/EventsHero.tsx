@@ -12,7 +12,7 @@ type Category = {
 }
 
 const CATEGORIES: Category[] = [
-  { slug: 'cars', image: '/events/bmw-cup-2026.webp' },
+  { slug: 'cars', image: '/events/cars-tile.webp' },
   // Pull the moto photo up so the full bike is in view — the source
   // frames the motorcycle toward the lower third of the shot, so the
   // default centre crop was clipping the front wheel.
