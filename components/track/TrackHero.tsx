@@ -16,8 +16,37 @@ export function TrackHero() {
   const locale = useLocale()
 
   return (
-    <section className="relative" aria-label="A1 Motor Park hero">
-      <div className="md:sticky md:top-24 md:h-[calc(100vh-7rem)]">
+    <section className="relative overflow-hidden" aria-label="A1 Motor Park hero">
+      {/* Ambient background — continuation of the loading-screen scene.
+          Dimming (opacity-55 + radial vignette rgba(5,5,5, 0 → .35 → .9))
+          mirrors the loading overlay exactly so the transition from
+          intro to hero reads as the same shot.
+          Revert: drop this <div> + the `relative z-10` on the child
+          below to return to a flat background. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+      >
+        <video
+          src="/home/hero-bg.mp4"
+          poster="/home/hero-bg-poster.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover opacity-55"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse at center, transparent 0%, rgba(5,5,5,0.35) 45%, rgba(5,5,5,0.9) 100%)',
+          }}
+        />
+      </div>
+
+      <div className="relative z-10 md:sticky md:top-24 md:h-[calc(100vh-7rem)]">
         <div className="mx-auto max-w-[1400px] w-full md:h-full px-5 md:px-8 pb-6 md:pb-10 pt-5 md:pt-8 flex flex-col md:grid md:grid-cols-[1fr_280px] gap-8 md:gap-6 lg:gap-8 md:items-stretch">
           {/* LEFT — 3D stage */}
           <div className="relative flex flex-col min-h-[62vh] md:min-h-0">
