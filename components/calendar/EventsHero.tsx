@@ -10,7 +10,7 @@ type Category = {
 
 const CATEGORIES: Category[] = [
   { slug: 'cars', image: '/events/bmw-cup-2026.webp' },
-  { slug: 'moto', image: '/events/gd-racing-2026-04.webp' },
+  { slug: 'moto', image: '/events/moto-tile.webp' },
   { slug: 'endurance', image: '/events/bes-999-2026.webp' },
   { slug: 'rally', image: '/events/premium-rally-2026-05.webp' },
 ]
