@@ -17,7 +17,11 @@ const CATEGORIES: Category[] = [
   // frames the motorcycle toward the lower third of the shot, so the
   // default centre crop was clipping the front wheel.
   { slug: 'moto', image: '/events/moto-tile.webp', objectPosition: 'center 65%' },
-  { slug: 'endurance', image: '/events/endurance-tile.webp' },
+  // Same story as the moto tile — the source frames the car slightly
+  // below centre, so a plain centre crop cut off the top of the car.
+  // Shift focus down the source so the image reads "pulled up" in the
+  // tile.
+  { slug: 'endurance', image: '/events/endurance-tile.webp', objectPosition: 'center 70%' },
   { slug: 'rally', image: '/events/rally-tile.webp' },
 ]
 
