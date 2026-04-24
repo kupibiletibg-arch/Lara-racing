@@ -34,13 +34,13 @@ export const socialPosts: SocialPost[] = [
   },
   {
     permalink: '#',
-    poster: '/social/porsche-918.webp',
-    alt: 'Porsche 918',
+    poster: '/social/ferrari-296.webp',
+    alt: 'Ferrari 296 Challenge',
   },
   {
     permalink: '#',
-    poster: '/social/ferrari-296.webp',
-    alt: 'Ferrari 296 Challenge',
+    poster: '/social/porsche-918.webp',
+    alt: 'Porsche 918',
   },
   {
     permalink: '#',
