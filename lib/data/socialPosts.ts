@@ -1,17 +1,16 @@
 /**
  * Posts rendered in the "What's up on socials" fan on the home page.
  *
- * Swap these out when real Instagram permalinks + portrait stills are
- * available. Until then:
+ * Six A1-branded portrait stills live under `/public/social/` — each
+ * pre-cropped to 9:16, resized to the native crop (540×960 … 977×1736)
+ * and encoded as WebP at quality 85, totalling ~390 KB for the full
+ * fan. When real Instagram permalinks land for these posts, swap each
+ * entry's `permalink` from `'#'` (which falls back to the profile URL
+ * inside <SocialFan />) to the post's https URL.
  *
- * - `permalink: '#'` makes the card fall back to the profile URL (the
- *   SocialFan component handles the swap at render time).
- * - `poster: ''` renders a dark brand-gradient tile with an "A1" mark
- *   instead of `<Image />`, so we have a full fan of 6 cards even
- *   before all the stills are shot.
- * - Event posters from `/public/events/*.webp` are reused as temporary
- *   portrait-ish fillers; they're square (850×850) but read fine once
- *   rotated inside the fan.
+ * Fallback paths still exist for future slots: setting `poster: ''`
+ * renders a dark brand-gradient tile with an "A1" mark so the fan
+ * never shows a broken image even when awaiting content.
  */
 export type SocialPost = {
   /** Full https URL to the IG post/reel, or `'#'` for the placeholder state. */
@@ -25,32 +24,32 @@ export type SocialPost = {
 export const socialPosts: SocialPost[] = [
   {
     permalink: '#',
-    poster: '/events/bes-999-2026.webp',
-    alt: 'BES 999 · 2026',
+    poster: '/social/bmw-m4-gt4.webp',
+    alt: 'BMW M4 GT4',
   },
   {
     permalink: '#',
-    poster: '/events/bmw-cup-2026.webp',
-    alt: 'BMW Cup · Round 1',
+    poster: '/social/abt-lamborghini.webp',
+    alt: 'ABT Lamborghini',
   },
   {
     permalink: '#',
-    poster: '/events/premium-rally-2026-05.webp',
-    alt: 'Premium Rally · May 2026',
+    poster: '/social/porsche-918.webp',
+    alt: 'Porsche 918',
   },
   {
     permalink: '#',
-    poster: '/events/gd-racing-2026-04.webp',
-    alt: 'GD Racing · April 2026',
+    poster: '/social/ferrari-296.webp',
+    alt: 'Ferrari 296 Challenge',
   },
   {
     permalink: '#',
-    poster: '',
-    alt: 'A1 Motor Park',
+    poster: '/social/est25.webp',
+    alt: 'A1 Motor Park · EST 2025',
   },
   {
     permalink: '#',
-    poster: '',
-    alt: 'Coming soon',
+    poster: '/social/hero-shot.webp',
+    alt: 'A1 Motor Park · hero shot',
   },
 ]
