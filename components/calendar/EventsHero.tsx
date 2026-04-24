@@ -6,11 +6,17 @@ type Category = {
   /** Query-string value for the calendar's `type` filter. */
   slug: 'cars' | 'moto' | 'endurance' | 'rally'
   image: string
+  /** Optional CSS `object-position` so we can shift the crop focal
+   *  point per-tile when a photo's subject doesn't sit dead-centre. */
+  objectPosition?: string
 }
 
 const CATEGORIES: Category[] = [
   { slug: 'cars', image: '/events/bmw-cup-2026.webp' },
-  { slug: 'moto', image: '/events/moto-tile.webp' },
+  // Pull the moto photo up so the full bike is in view — the source
+  // frames the motorcycle toward the lower third of the shot, so the
+  // default centre crop was clipping the front wheel.
+  { slug: 'moto', image: '/events/moto-tile.webp', objectPosition: 'center 78%' },
   { slug: 'endurance', image: '/events/bes-999-2026.webp' },
   { slug: 'rally', image: '/events/premium-rally-2026-05.webp' },
 ]
@@ -80,6 +86,11 @@ export async function EventsHero() {
                   fill
                   sizes="(min-width: 1024px) 50vw, 100vw"
                   className="object-cover opacity-55 group-hover:opacity-75 transition-opacity duration-300"
+                  style={
+                    c.objectPosition
+                      ? { objectPosition: c.objectPosition }
+                      : undefined
+                  }
                   aria-hidden
                 />
                 <div
