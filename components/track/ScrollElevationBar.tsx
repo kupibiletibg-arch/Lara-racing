@@ -38,7 +38,13 @@ export function ScrollElevationBar() {
 
   return (
     <div
-      className="sticky top-24 md:top-28 z-30 -mt-px border-b rule bg-bg/75 backdrop-blur-md"
+      // Stack order:
+      //   z-40  header
+      //   z-30  mobile nav overlay
+      //   z-20  this bar  ← sits under the overlay so the hamburger
+      //                    drop-down covers it on phones
+      //   z-0   page content
+      className="sticky top-24 md:top-28 z-20 -mt-px border-b rule bg-bg/75 backdrop-blur-md"
       aria-hidden
     >
       <div className="mx-auto max-w-[1400px] px-5 md:px-8 py-2 md:py-3">
