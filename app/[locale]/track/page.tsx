@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { trackMeta, elevation } from '@/lib/data/track'
 
@@ -17,8 +18,33 @@ export default async function TrackPage({ params }: { params: { locale: string }
     .join(' ')
 
   return (
-    <section className="mx-auto max-w-[1200px] px-5 md:px-8 py-12 md:py-20">
-      <p className="telemetry mb-3">TRACK · A1 MOTOR PARK</p>
+    <>
+      {/* Full-viewport page background — circuit render supplied by
+          the client. Sits behind all page content with a layered tint
+          (dimmed image + radial vignette + flat bg/60) so the text
+          and charts above it stay legible at every viewport size.
+          `-z-10` keeps it inside the z-10 page stacking context but
+          below the actual content. */}
+      <div aria-hidden className="fixed inset-0 pointer-events-none -z-10">
+        <Image
+          src="/track/page-bg.webp"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover opacity-35"
+          priority={false}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse at center, rgba(5,5,5,0.35) 0%, rgba(5,5,5,0.75) 60%, rgba(5,5,5,0.92) 100%)',
+          }}
+        />
+      </div>
+
+      <section className="relative mx-auto max-w-[1200px] px-5 md:px-8 py-12 md:py-20">
+        <p className="telemetry mb-3">TRACK · A1 MOTOR PARK</p>
       <h1 className="font-display font-bold text-[44px] md:text-[64px] leading-[0.95] tracking-tight">
         {t('title')}
       </h1>
@@ -70,7 +96,8 @@ export default async function TrackPage({ params }: { params: { locale: string }
           <span>{trackMeta.lengthM} M</span>
         </div>
       </div>
-    </section>
+      </section>
+    </>
   )
 }
 
