@@ -1,5 +1,4 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server'
-import { FacilityMap } from '@/components/facilities/FacilityMap'
 import { trackMeta, elevation } from '@/lib/data/track'
 
 export default async function TrackPage({ params }: { params: { locale: string } }) {
@@ -33,10 +32,9 @@ export default async function TrackPage({ params }: { params: { locale: string }
         <Stat label={t('directionLabel')} value={t('direction')} />
       </dl>
 
-      <div className="mt-16">
-        <FacilityMap />
-      </div>
-
+      {/* Elevation profile moved up — sits directly under the track
+          stats now that the facility schema has been removed from this
+          page (facilities live on their own /facilities route). */}
       <div className="mt-16">
         <div className="flex items-baseline justify-between">
           <h2 className="font-display font-bold text-[24px] md:text-[32px] tracking-tight">
