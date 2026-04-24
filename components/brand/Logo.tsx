@@ -7,20 +7,20 @@ type LogoProps = {
 
 /**
  * Official A1 Motor Park logo (raster PNG).
- * Intrinsic dimensions: 150 × 92 (≈1.63:1).
+ * Intrinsic dimensions: 1000 × 252 (≈3.97:1) — hi-res supplied by the client.
  */
 export function Logo({ variant = 'full', className }: LogoProps) {
   const sizeClasses =
     variant === 'mark'
       ? 'h-10 md:h-12 w-auto'
-      : 'h-24 md:h-28 w-auto'
+      : 'h-12 md:h-16 w-auto'
 
   return (
     <Image
       src="/brand/a1-motor-park-logo.png"
       alt="A1 Motor Park"
-      width={150}
-      height={92}
+      width={1000}
+      height={252}
       priority
       className={`${sizeClasses} ${className ?? ''}`.trim()}
     />

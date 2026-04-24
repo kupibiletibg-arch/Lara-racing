@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { Roboto_Slab, Inter_Tight, JetBrains_Mono } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, setRequestLocale } from 'next-intl/server'
@@ -8,7 +9,8 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { GrainOverlay } from '@/components/layout/GrainOverlay'
 import { TopoBackground } from '@/components/layout/TopoBackground'
-import { LoadingScreen } from '@/components/layout/LoadingScreen'
+import { RoutePrefetcher } from '@/components/layout/RoutePrefetcher'
+import IntroSequence from '@/components/IntroSequence'
 import '../globals.css'
 
 const display = Roboto_Slab({
@@ -61,10 +63,20 @@ export default async function LocaleLayout({
         <TopoBackground />
         <GrainOverlay />
         <NextIntlClientProvider messages={messages} locale={locale}>
-          <LoadingScreen />
+          <a href="#main" className="a1-skip-link">Skip to content</a>
+          {/* IntroSequence reads useSearchParams(); the Suspense wrapper
+              keeps static generation happy by letting Next bail out of
+              the prerender for this client-only bit without tainting
+              the rest of the page. */}
+          <Suspense fallback={null}>
+            <IntroSequence locale={locale as 'bg' | 'en'} />
+          </Suspense>
+          <RoutePrefetcher locale={locale} />
           <div className="relative z-10 min-h-screen flex flex-col">
             <Header />
-            <main className="flex-1">{children}</main>
+            <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
+              {children}
+            </main>
             <Footer />
           </div>
         </NextIntlClientProvider>
