@@ -18,7 +18,7 @@ const CATEGORIES: Category[] = [
   // default centre crop was clipping the front wheel.
   { slug: 'moto', image: '/events/moto-tile.webp', objectPosition: 'center 65%' },
   { slug: 'endurance', image: '/events/bes-999-2026.webp' },
-  { slug: 'rally', image: '/events/premium-rally-2026-05.webp' },
+  { slug: 'rally', image: '/events/rally-tile.webp' },
 ]
 
 /**
