@@ -90,7 +90,15 @@
     "addressLabel": "Адрес",
     "address": "гр. Самоков, България",
     "emailLabel": "Имейл",
-    "phoneLabel": "Телефон"
+    "phoneLabel": "Телефон",
+    "formHeading": "Свържи се с нас",
+    "formIntro": "Изпрати ни съобщение и ще ти отговорим възможно най-скоро.",
+    "formName": "Име",
+    "formEmail": "Имейл",
+    "formMessage": "Съобщение",
+    "formSubmit": "Изпрати",
+    "formSubject": "Запитване от a1motorpark.com",
+    "formSuccess": "Благодарим — ще се свържем възможно най-скоро."
   },
   "footer": {
     "tagline": "Първата FIA Grade 3 писта в България.",

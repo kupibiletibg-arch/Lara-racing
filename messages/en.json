@@ -90,7 +90,15 @@
     "addressLabel": "Address",
     "address": "Samokov, Bulgaria",
     "emailLabel": "Email",
-    "phoneLabel": "Phone"
+    "phoneLabel": "Phone",
+    "formHeading": "Get in touch",
+    "formIntro": "Send us a message and we'll get back to you shortly.",
+    "formName": "Name",
+    "formEmail": "Email",
+    "formMessage": "Message",
+    "formSubmit": "Send",
+    "formSubject": "Enquiry from a1motorpark.com",
+    "formSuccess": "Thanks — we'll be in touch shortly."
   },
   "footer": {
     "tagline": "Bulgaria's first FIA Grade 3 circuit.",

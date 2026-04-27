@@ -1,4 +1,5 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server'
+import { ContactForm } from '@/components/contact/ContactForm'
 
 export default async function ContactPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale)
@@ -18,14 +19,34 @@ export default async function ContactPage({ params }: { params: { locale: string
 
         <dt className="telemetry">{t('emailLabel')}</dt>
         <dd className="font-mono text-[14px]">
-          <a href="mailto:info@a1motorpark.example" className="hover:text-brand transition-colors">
-            info@a1motorpark.example
+          <a
+            href="mailto:info@a1motorpark.com"
+            className="hover:text-brand transition-colors"
+          >
+            info@a1motorpark.com
           </a>
         </dd>
 
         <dt className="telemetry">{t('phoneLabel')}</dt>
-        <dd className="font-mono text-[14px]">+359 (0) 2 000 0000</dd>
+        <dd className="font-mono text-[14px]">
+          <a
+            href="tel:+359882323232"
+            className="hover:text-brand transition-colors"
+          >
+            +359 882 323 232
+          </a>
+        </dd>
       </dl>
+
+      <div className="mt-16 md:mt-20 border-t rule pt-10 md:pt-14">
+        <h2 className="font-display font-bold text-[28px] md:text-[36px] leading-tight tracking-tight">
+          {t('formHeading')}
+        </h2>
+        <p className="mt-3 text-ink/70 text-[14px] md:text-[15px] max-w-md">
+          {t('formIntro')}
+        </p>
+        <ContactForm />
+      </div>
     </section>
   )
 }
