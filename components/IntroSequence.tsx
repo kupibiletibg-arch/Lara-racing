@@ -500,18 +500,21 @@ export default function IntroSequence({
               <use href="#a1mp-track" className="a1mp-pl-track-inner" />
 
               {/* White arrow with narrow red outline, tracing the
-                  racing line. animateMotion follows the path with
-                  auto-rotation so the arrow points along the direction
-                  of travel — like a lap-indicator car icon.
-                  `key={pathname}` forces React to tear down + remount
-                  the SMIL element on every route change. Without this
-                  the arrow's SMIL timeline carries over (this is a
-                  layout-level component, so React reuses the DOM
-                  node) and the second visit would see the arrow
-                  frozen halfway through a lap. */}
+                  racing line. We drive the motion via CSS
+                  `offset-path` + an `@keyframes` lap (see styles
+                  below) instead of SMIL <animateMotion>. CSS motion
+                  is composited and reliably restarts on remount,
+                  while SMIL kept its document-timeline state across
+                  Next route changes (IntroSequence lives in the
+                  layout, so React reuses the DOM node) and stalled
+                  the arrow on subsequent navigations.
+                  `key={pathname}` is still here as a belt-and-
+                  braces measure: it forces a fresh element + a fresh
+                  CSS animation on every route change. */}
               <g
                 key={pathname}
                 className="a1mp-pl-arrow a1mp-pl-arrow-1"
+                style={{ offsetPath: `path("${trackPath}")` }}
               >
                 <polygon
                   points="-22,-14 22,0 -22,14 -14,0"
@@ -520,14 +523,6 @@ export default function IntroSequence({
                   strokeWidth={2.5}
                   strokeLinejoin="round"
                 />
-                <animateMotion
-                  dur="3.2s"
-                  repeatCount="indefinite"
-                  rotate="auto"
-                  begin="0s"
-                >
-                  <mpath href="#a1mp-track" />
-                </animateMotion>
               </g>
             </g>
           </g>
@@ -761,12 +756,20 @@ const css = `
 .a1mp-pl-track-inner { stroke: transparent; stroke-width: 0; vector-effect: non-scaling-stroke; }
 @keyframes a1mp-draw { to { stroke-dashoffset: 0; } }
 
-/* Chase arrows — white triangle with narrow red outline that follows
-   the racing line via <animateMotion>. Two laps per preloader, then
-   hidden during the reveal so the clean outline zooms alone. */
+/* Chase arrow — white triangle with narrow red outline that follows
+   the racing line via CSS offset-path (set inline on the element)
+   plus offset-distance keyframes. The path itself is supplied per
+   instance through inline style so React owns the geometry; the
+   animation timing + auto-rotation live here.
+   Composited motion is far more reliable than SMIL across route
+   changes — SMIL kept the SVG document timeline state and stalled
+   on second visits. */
 .a1mp-pl-arrow {
   opacity: 0;
   transition: opacity 0.18s ease-out;
+  offset-rotate: auto;
+  offset-distance: 0%;
+  animation: a1mp-trace 3.2s linear infinite;
 }
 .a1mp-pl.phase-video .a1mp-pl-arrow,
 .a1mp-pl.phase-preloader .a1mp-pl-arrow {
@@ -775,6 +778,10 @@ const css = `
 .a1mp-pl.phase-revealing .a1mp-pl-arrow { opacity: 0; }
 @keyframes a1mp-fade { to { opacity: 1; } }
 @keyframes a1mp-run  { to { stroke-dashoffset: -100; } }
+@keyframes a1mp-trace {
+  from { offset-distance: 0%; }
+  to   { offset-distance: 100%; }
+}
 
 .a1mp-pl-logo {
   opacity: 0;
@@ -836,7 +843,8 @@ const css = `
 @media (prefers-reduced-motion: reduce) {
   .a1mp-pl-track-outer,
   .a1mp-pl-track-inner { stroke-dashoffset: 0 !important; animation: none !important; }
-  .a1mp-pl-chase { opacity: 1 !important; animation: none !important; }
+  .a1mp-pl-chase,
+  .a1mp-pl-arrow { opacity: 1 !important; animation: none !important; offset-distance: 50% !important; }
   .a1mp-pl-logo { opacity: 1 !important; transform: translate(-50%, -50%) scale(1) !important; transition: none !important; }
   .a1mp-pl-ticker,
   .a1mp-pl-brand-mark,
