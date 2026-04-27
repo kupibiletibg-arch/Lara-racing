@@ -85,14 +85,19 @@ export function Footer() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="kupibileti.bg"
-          className="flex items-end hover:opacity-90 transition-opacity"
+          className="flex flex-col items-end gap-2 md:gap-3 hover:opacity-90 transition-opacity"
         >
+          <span className="font-mono tracking-mono uppercase text-[10px] md:text-[11px] text-ink/60">
+            {t('ticketing')}
+          </span>
           <Image
             src="/partners/kupibileti.svg"
             alt="kupibileti.bg"
             width={1007}
             height={307}
-            className="h-10 md:h-10 w-auto"
+            // Bumped up so the kupibileti mark visually balances the
+            // A1 logo on the opposite side of the footer row.
+            className="h-12 md:h-20 w-auto"
           />
         </a>
       </div>
