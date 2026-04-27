@@ -85,7 +85,11 @@ export function Footer() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="kupibileti.bg"
-          className="flex flex-col items-end gap-2 md:gap-3 hover:opacity-90 transition-opacity"
+          // `items-center` so the "Билети от" label centres above the
+          // logo glyph rather than hugging its right edge. The whole
+          // anchor still sits in the row's right slot via the parent
+          // `justify-between`, so visually nothing else moves.
+          className="flex flex-col items-center gap-2 md:gap-3 hover:opacity-90 transition-opacity"
         >
           <span className="font-mono tracking-mono uppercase text-[10px] md:text-[11px] text-ink/60">
             {t('ticketing')}
