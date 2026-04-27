@@ -8,6 +8,7 @@
     "experiencesHotLaps": "Hot laps",
     "experiencesAcademy": "Academy",
     "experiencesVrRacing": "VR racing",
+    "calendarTrackDays": "Track days",
     "partners": "Partners",
     "about": "About",
     "contact": "Contact",
@@ -155,5 +156,66 @@
     "title": "What's up on socials",
     "subtitle": "Follow A1 Motor Park",
     "cta": "@a1.motor.park"
+  },
+  "trackDays": {
+    "kicker": "OPEN TRACK DAYS · 2026",
+    "title": "Open track days",
+    "intro": "Drive at your own pace on Bulgaria's first FIA Grade 3 circuit. Minimum 6 sessions × 18-20 minutes depending on the number of participants.",
+    "card": {
+      "autoTitle": "Open day Auto",
+      "autoDescription": "Open day Auto at A1 Motor Park is the open-track format on the newest and only FIA & FIM certified circuit in Bulgaria. Drive your own car at your own pace on a wide-open track.",
+      "motoTitle": "Open day Moto",
+      "motoDescription": "Open day Moto at A1 Motor Park is the open-track format on the newest and only FIA & FIM certified circuit in Bulgaria. Ride your own bike at your own pace on a wide-open track.",
+      "priceWeek": "Weekday",
+      "priceWeekend": "Weekend",
+      "buy": "Buy voucher",
+      "autoWeekPrice": "€150",
+      "autoWeekendPrice": "€180",
+      "motoWeekPrice": "€135",
+      "motoWeekendPrice": "€150"
+    },
+    "voucherSoon": "Coming soon",
+    "contact": {
+      "label": "Reserve your spot at:",
+      "phone": "+359 882 323 232",
+      "email": "trackday@a1motorpark.com"
+    },
+    "before": {
+      "kicker": "IMPORTANT",
+      "heading": "Before you arrive",
+      "i1": "Each participant must hold a valid driver's licence for the vehicle they bring.",
+      "i2": "Download the disclaimer; bring it filled in to reception.",
+      "i3": "A safety-rated helmet is mandatory.",
+      "i4": "The vehicle must be in good technical condition.",
+      "i5": "No competition licence required.",
+      "i6": "No own machine? Get in touch — rentals are available."
+    },
+    "included": {
+      "kicker": "INCLUDED",
+      "heading": "What's included",
+      "i1": "Full-day track access.",
+      "i2": "Pre-start safety briefing.",
+      "i3": "Marshals on track throughout the event.",
+      "i4": "Parking + pit-lane access.",
+      "i5": "Access to café, restaurant and complex amenities."
+    },
+    "extras": {
+      "kicker": "TARIFFS",
+      "heading": "Additional services",
+      "helmetLabel": "Helmet rental",
+      "helmetPrice": "€10",
+      "transponderLabel": "Transponder rental",
+      "transponderPrice": "€15",
+      "passengerLabel": "Passenger fee",
+      "passengerPrice": "€40",
+      "secondPilotLabel": "Second-pilot fee",
+      "secondPilotPrice": "€60",
+      "boxWeekLabel": "Pit box (Mon-Thu)",
+      "boxWeekPrice": "€120",
+      "boxFridayLabel": "Pit box (Fri)",
+      "boxFridayPrice": "€140",
+      "boxWeekendLabel": "Pit box (Sat-Sun)",
+      "boxWeekendPrice": "€160"
+    }
   }
 }

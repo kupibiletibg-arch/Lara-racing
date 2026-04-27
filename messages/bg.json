@@ -8,6 +8,7 @@
     "experiencesHotLaps": "Горещи обиколки",
     "experiencesAcademy": "Академия",
     "experiencesVrRacing": "VR рейсинг",
+    "calendarTrackDays": "Track days",
     "partners": "Партньори",
     "about": "За нас",
     "contact": "Контакт",
@@ -155,5 +156,66 @@
     "title": "Какво става в социалните ни мрежи",
     "subtitle": "Последвай A1 Motor Park",
     "cta": "@a1.motor.park"
+  },
+  "trackDays": {
+    "kicker": "OPEN TRACK DAYS · 2026",
+    "title": "Open track days",
+    "intro": "Карайте със собствено темпо на първата FIA Grade 3 писта в България. Минимум 6 сесии × 18-20 минути в зависимост от броя на участниците.",
+    "card": {
+      "autoTitle": "Open day Auto",
+      "autoDescription": "Open day Auto в А1 Motor Park е първият ден за най-новата и единствена FIA & FIM сертифицирана писта в България. Карайте с тази кола в собствено темпо на отворен трак.",
+      "motoTitle": "Open day Moto",
+      "motoDescription": "Open day Moto в А1 Motor Park е първият ден за най-новата и единствена FIA & FIM сертифицирана писта в България. Карайте с този мотор в собствено темпо на отворен трак.",
+      "priceWeek": "През седмицата",
+      "priceWeekend": "Уикенд",
+      "buy": "Купи ваучер",
+      "autoWeekPrice": "150 €",
+      "autoWeekendPrice": "180 €",
+      "motoWeekPrice": "135 €",
+      "motoWeekendPrice": "150 €"
+    },
+    "voucherSoon": "Очаквайте скоро",
+    "contact": {
+      "label": "Резервирай своето място на:",
+      "phone": "+359 882 323 232",
+      "email": "trackday@a1motorpark.com"
+    },
+    "before": {
+      "kicker": "ВАЖНО",
+      "heading": "Важно преди да дойдеш",
+      "i1": "Всеки участник трябва да притежава валиден лиценз за управление на моторно превозно средство.",
+      "i2": "Изтеглете декларация, която трябва да бъде предадена на рецепция.",
+      "i3": "Задължителна каска, отговаряща на стандартите за безопасност.",
+      "i4": "Автомобилът трябва да е в добро техническо състояние.",
+      "i5": "Не се изисква състезателен лиценз.",
+      "i6": "Нямаш собствена машина? Свържи се с нас за опции под наем."
+    },
+    "included": {
+      "kicker": "ВКЛЮЧЕНО",
+      "heading": "Какво е включено",
+      "i1": "Достъп до пистата за целия ден.",
+      "i2": "Брифинг за безопасност преди старта.",
+      "i3": "Маршали на трасето по време на цялото събитие.",
+      "i4": "Паркинг и достъп до пит лейн.",
+      "i5": "Достъп до кафе, ресторант и съоръженията на комплекса."
+    },
+    "extras": {
+      "kicker": "ТАРИФИ",
+      "heading": "Допълнителни услуги",
+      "helmetLabel": "Наем каска",
+      "helmetPrice": "10 €",
+      "transponderLabel": "Наем транспондер",
+      "transponderPrice": "15 €",
+      "passengerLabel": "Такса пасажер",
+      "passengerPrice": "40 €",
+      "secondPilotLabel": "Такса втори пилот",
+      "secondPilotPrice": "60 €",
+      "boxWeekLabel": "Наем бокс (пон.-чет.)",
+      "boxWeekPrice": "120 €",
+      "boxFridayLabel": "Наем бокс (пет.)",
+      "boxFridayPrice": "140 €",
+      "boxWeekendLabel": "Наем бокс (съб.-нед.)",
+      "boxWeekendPrice": "160 €"
+    }
   }
 }

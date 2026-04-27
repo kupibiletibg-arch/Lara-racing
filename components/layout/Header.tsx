@@ -72,7 +72,13 @@ export function Header() {
   // keeps the menu scannable without adding a tap target to expand.
   const links: NavLink[] = [
     { href: `/${locale}`, label: t('home'), exact: true },
-    { href: `/${locale}/calendar`, label: t('calendar') },
+    {
+      href: `/${locale}/calendar`,
+      label: t('calendar'),
+      children: [
+        { href: `/${locale}/calendar/track-days`, label: t('calendarTrackDays') },
+      ],
+    },
     { href: `/${locale}/track`, label: t('track') },
     { href: `/${locale}/facilities`, label: t('facilities') },
     {
