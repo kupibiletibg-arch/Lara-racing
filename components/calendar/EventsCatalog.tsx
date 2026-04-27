@@ -2,10 +2,9 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useLocale, useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import type { CatalogEvent, CatalogCategory } from '@/lib/calendar/buildCatalog'
 import { sortCatalog } from '@/lib/calendar/buildCatalog'
-import { monthLabel } from '@/lib/calendar/formatDateRange'
 import { CategoryChips, type ChipOption } from './CategoryChips'
 import { EventCard } from './EventCard'
 
@@ -15,16 +14,13 @@ type Props = {
 
 type WhenFilter = 'all' | 'upcoming' | 'past'
 type CategoryFilter = 'all' | CatalogCategory
-type MonthFilter = 'all' | string // "01".."12"
 
 const DEFAULT_FILTERS = {
   type: 'all' as CategoryFilter,
   when: 'all' as WhenFilter,
-  month: 'all' as MonthFilter,
 }
 
 export function EventsCatalog({ events }: Props) {
-  const locale = useLocale() as 'bg' | 'en'
   const t = useTranslations('calendar')
   const tType = useTranslations('eventType')
   const router = useRouter()
@@ -34,14 +30,16 @@ export function EventsCatalog({ events }: Props) {
   const current = {
     type: ((params.get('type') ?? DEFAULT_FILTERS.type) as CategoryFilter),
     when: ((params.get('when') ?? DEFAULT_FILTERS.when) as WhenFilter),
-    month: (params.get('month') ?? DEFAULT_FILTERS.month) as MonthFilter,
   }
 
   const setFilter = useCallback(
-    (key: 'type' | 'when' | 'month', value: string) => {
+    (key: 'type' | 'when', value: string) => {
       const next = new URLSearchParams(params.toString())
       if (value === DEFAULT_FILTERS[key]) next.delete(key)
       else next.set(key, value)
+      // Drop any legacy `month` query param so URLs stay clean now
+      // that month filtering has been removed.
+      next.delete('month')
       const qs = next.toString()
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
     },
@@ -86,24 +84,6 @@ export function EventsCatalog({ events }: Props) {
     ]
   }, [events, t, now])
 
-  const monthOptions = useMemo<ChipOption<MonthFilter>[]>(() => {
-    const months = new Set<number>()
-    for (const e of events) if (e.startDate) months.add(e.startDate.getUTCMonth())
-    const sorted = Array.from(months).sort((a, b) => a - b)
-    const list: ChipOption<MonthFilter>[] = [
-      { value: 'all', label: t('filters.all') },
-    ]
-    for (const m of sorted) {
-      const key = String(m + 1).padStart(2, '0')
-      list.push({
-        value: key,
-        label: monthLabel(m, locale),
-        count: events.filter((e) => e.startDate?.getUTCMonth() === m).length,
-      })
-    }
-    return list
-  }, [events, t, locale])
-
   const filtered = useMemo(() => {
     return sortCatalog(
       events.filter((e) => {
@@ -115,19 +95,13 @@ export function EventsCatalog({ events }: Props) {
           if (current.when === 'upcoming' && past) return false
         }
 
-        if (current.month !== 'all') {
-          if (!e.startDate) return false
-          const mm = String(e.startDate.getUTCMonth() + 1).padStart(2, '0')
-          if (mm !== current.month) return false
-        }
-
         return true
       }),
     )
-  }, [events, current.type, current.when, current.month, now])
+  }, [events, current.type, current.when, now])
 
   const hasAnyFilter =
-    current.type !== 'all' || current.when !== 'all' || current.month !== 'all'
+    current.type !== 'all' || current.when !== 'all'
 
   // The category list is collapsed by default — only expanded when the
   // viewer clicks the chevron, OR when a non-default category filter is
@@ -218,16 +192,6 @@ export function EventsCatalog({ events }: Props) {
           </div>
         </div>
 
-        {monthOptions.length > 1 && (
-          <FilterRow label={t('filters.month')}>
-            <CategoryChips
-              ariaLabel={t('filters.month')}
-              options={monthOptions}
-              value={current.month}
-              onChange={(v) => setFilter('month', v)}
-            />
-          </FilterRow>
-        )}
         {hasAnyFilter && (
           <div className="mt-2">
             <button
