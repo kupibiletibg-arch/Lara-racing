@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import type { CatalogEvent, CatalogCategory } from '@/lib/calendar/buildCatalog'
@@ -129,17 +129,27 @@ export function EventsCatalog({ events }: Props) {
   const hasAnyFilter =
     current.type !== 'all' || current.when !== 'all' || current.month !== 'all'
 
+  // The category list is collapsed by default — only expanded when the
+  // viewer clicks the chevron, OR when a non-default category filter is
+  // already active (so they can see / change which one without an
+  // extra tap).
+  const [categoryOpen, setCategoryOpen] = useState<boolean>(
+    () => current.type !== 'all',
+  )
+  const activeCategoryLabel =
+    current.type === 'all'
+      ? null
+      : (categoryOptions.find((o) => o.value === current.type)?.label ?? null)
+
+  const onResetClick = useCallback(() => {
+    resetFilters()
+    setCategoryOpen(false)
+  }, [resetFilters])
+
   return (
     <div>
       <div className="sticky top-20 md:top-28 z-20 -mx-5 md:-mx-8 px-5 md:px-8 py-4 md:py-5 mb-8 md:mb-12 bg-bg/80 backdrop-blur-md border-b rule">
-        <FilterRow label={t('filters.category')}>
-          <CategoryChips
-            ariaLabel={t('filters.category')}
-            options={categoryOptions}
-            value={current.type}
-            onChange={(v) => setFilter('type', v)}
-          />
-        </FilterRow>
+        {/* Primary filter — Кога. Always visible chips. */}
         <FilterRow label={t('filters.when')}>
           <CategoryChips
             ariaLabel={t('filters.when')}
@@ -148,6 +158,66 @@ export function EventsCatalog({ events }: Props) {
             onChange={(v) => setFilter('when', v)}
           />
         </FilterRow>
+
+        {/* Primary filter — Категория. Collapsed by default; the chips
+            slide in beneath the toggle button only after the chevron is
+            clicked (or when a category filter is already active). */}
+        <div className="mb-2 md:mb-3 last:mb-0">
+          <button
+            type="button"
+            onClick={() => setCategoryOpen((o) => !o)}
+            aria-expanded={categoryOpen}
+            aria-controls="filters-category-panel"
+            className="flex flex-col md:flex-row md:items-center md:gap-4 w-full text-left"
+          >
+            <span className="telemetry !text-[10px] md:!text-[11px] md:min-w-[96px] mb-1.5 md:mb-0 inline-flex items-center gap-2">
+              {t('filters.category')}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+                className={`h-3 w-3 transition-transform duration-200 ${
+                  categoryOpen ? 'rotate-180' : ''
+                }`}
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </span>
+            {/* When collapsed and a filter is active, surface the active
+                value next to the label so the viewer doesn't have to
+                expand to know which category is filtering the list. */}
+            {!categoryOpen && activeCategoryLabel && (
+              <span className="font-mono tracking-mono uppercase text-[11px] text-brand">
+                · {activeCategoryLabel}
+              </span>
+            )}
+          </button>
+
+          <div
+            id="filters-category-panel"
+            className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
+              categoryOpen
+                ? 'grid-rows-[1fr] opacity-100 mt-2 md:mt-3'
+                : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+            }`}
+          >
+            <div className="min-h-0 overflow-hidden">
+              <div className="md:pl-[112px]">
+                <CategoryChips
+                  ariaLabel={t('filters.category')}
+                  options={categoryOptions}
+                  value={current.type}
+                  onChange={(v) => setFilter('type', v)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {monthOptions.length > 1 && (
           <FilterRow label={t('filters.month')}>
             <CategoryChips
@@ -162,7 +232,7 @@ export function EventsCatalog({ events }: Props) {
           <div className="mt-2">
             <button
               type="button"
-              onClick={resetFilters}
+              onClick={onResetClick}
               className="font-mono tracking-mono uppercase text-[10px] text-ink/60 hover:text-brand transition-colors border-b rule pb-0.5"
             >
               {t('filters.reset')} ×
