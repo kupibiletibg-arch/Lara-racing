@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { TrackDayCard } from '@/components/calendar/TrackDayCard'
 import { TrackDayInfo } from '@/components/calendar/TrackDayInfo'
@@ -11,6 +12,7 @@ export default async function TrackDaysPage({
 }) {
   setRequestLocale(params.locale)
   const t = await getTranslations('trackDays')
+  const { locale } = params
 
   return (
     <>
@@ -44,6 +46,20 @@ export default async function TrackDaysPage({
         <p className="mt-4 md:mt-5 text-ink/80 text-[15px] md:text-[17px] leading-relaxed max-w-2xl">
           {t('intro')}
         </p>
+
+        {/* Secondary CTA — sends the visitor to the full season
+            catalog so they can see how the open-track-day formats sit
+            inside the rest of the calendar. Outlined treatment so it
+            doesn't compete with the brand-red voucher CTA on the
+            cards below. */}
+        <div className="mt-6 md:mt-8">
+          <Link
+            href={`/${locale}/calendar`}
+            className="inline-flex items-center gap-2 border rule px-5 md:px-6 py-3 font-mono tracking-mono uppercase text-[11px] md:text-[12px] text-ink/85 hover:text-ink hover:bg-ink/5 transition-colors"
+          >
+            {t('viewCalendar')} →
+          </Link>
+        </div>
 
         {/* Two product cards (Auto + Moto) + booking contact strip. */}
         <div className="mt-10 md:mt-14 grid lg:grid-cols-2 gap-6 md:gap-8">
