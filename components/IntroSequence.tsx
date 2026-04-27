@@ -502,12 +502,17 @@ export default function IntroSequence({
               {/* White arrow with narrow red outline, tracing the
                   racing line. animateMotion follows the path with
                   auto-rotation so the arrow points along the direction
-                  of travel — like a lap-indicator car icon. */}
-              {/* Single arrow on the track — white fill + narrow red
-                  outline, follows the racing line via animateMotion.
-                  rotate="auto" turns the arrow to point along the
-                  direction of travel. */}
-              <g className="a1mp-pl-arrow a1mp-pl-arrow-1">
+                  of travel — like a lap-indicator car icon.
+                  `key={pathname}` forces React to tear down + remount
+                  the SMIL element on every route change. Without this
+                  the arrow's SMIL timeline carries over (this is a
+                  layout-level component, so React reuses the DOM
+                  node) and the second visit would see the arrow
+                  frozen halfway through a lap. */}
+              <g
+                key={pathname}
+                className="a1mp-pl-arrow a1mp-pl-arrow-1"
+              >
                 <polygon
                   points="-22,-14 22,0 -22,14 -14,0"
                   fill="#ffffff"
