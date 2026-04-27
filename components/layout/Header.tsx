@@ -72,13 +72,10 @@ export function Header() {
   // keeps the menu scannable without adding a tap target to expand.
   const links: NavLink[] = [
     { href: `/${locale}`, label: t('home'), exact: true },
-    {
-      href: `/${locale}/calendar`,
-      label: t('calendar'),
-      children: [
-        { href: `/${locale}/calendar/track-days`, label: t('calendarTrackDays') },
-      ],
-    },
+    // Track days promoted to its own top-level item, sitting just to
+    // the left of Календар per the latest brief.
+    { href: `/${locale}/calendar/track-days`, label: t('trackDays') },
+    { href: `/${locale}/calendar`, label: t('calendar') },
     { href: `/${locale}/track`, label: t('track') },
     { href: `/${locale}/facilities`, label: t('facilities') },
     {
@@ -91,7 +88,9 @@ export function Header() {
       ],
     },
     { href: `/${locale}/partners`, label: t('partners') },
-    { href: `/${locale}/about`, label: t('about') },
+    // /about route file still exists but is no longer surfaced in
+    // navigation per the latest brief — accessible only via direct
+    // URL until we decide whether to delete the route entirely.
     { href: `/${locale}/contact`, label: t('contact') },
     { href: `/${locale}/shop`, label: t('shop') },
   ]
