@@ -12,12 +12,16 @@ type Props = {
   events: CatalogEvent[]
 }
 
-type WhenFilter = 'all' | 'upcoming' | 'past'
+type WhenFilter = 'upcoming' | 'past'
 type CategoryFilter = 'all' | CatalogCategory
 
+// `when` defaults to upcoming events — the most useful first read of
+// the calendar. The viewer can flip to "Отминали" with a single tap;
+// there's no longer an "all" option since it conflated two meaningful
+// states into a noisy mixed list.
 const DEFAULT_FILTERS = {
   type: 'all' as CategoryFilter,
-  when: 'all' as WhenFilter,
+  when: 'upcoming' as WhenFilter,
 }
 
 export function EventsCatalog({ events }: Props) {
@@ -27,9 +31,13 @@ export function EventsCatalog({ events }: Props) {
   const pathname = usePathname()
   const params = useSearchParams()
 
+  // Validate `when` so legacy `?when=all` (or any other unknown value)
+  // gracefully falls back to the default rather than rendering with no
+  // active chip.
+  const rawWhen = params.get('when')
   const current = {
     type: ((params.get('type') ?? DEFAULT_FILTERS.type) as CategoryFilter),
-    when: ((params.get('when') ?? DEFAULT_FILTERS.when) as WhenFilter),
+    when: (rawWhen === 'past' ? 'past' : 'upcoming') as WhenFilter,
   }
 
   const setFilter = useCallback(
@@ -78,7 +86,6 @@ export function EventsCatalog({ events }: Props) {
     const isPast = (e: CatalogEvent) => e.startDate && e.startDate < now && !e.dateTBD
     const isUpcoming = (e: CatalogEvent) => !isPast(e)
     return [
-      { value: 'all', label: t('filters.all'), count: events.length },
       { value: 'upcoming', label: t('filters.upcoming'), count: events.filter(isUpcoming).length },
       { value: 'past', label: t('filters.past'), count: events.filter(isPast).length },
     ]
@@ -89,19 +96,21 @@ export function EventsCatalog({ events }: Props) {
       events.filter((e) => {
         if (current.type !== 'all' && e.category !== current.type) return false
 
-        if (current.when !== 'all') {
-          const past = e.startDate && e.startDate < now && !e.dateTBD
-          if (current.when === 'past' && !past) return false
-          if (current.when === 'upcoming' && past) return false
-        }
+        const past = e.startDate && e.startDate < now && !e.dateTBD
+        if (current.when === 'past' && !past) return false
+        if (current.when === 'upcoming' && past) return false
 
         return true
       }),
     )
   }, [events, current.type, current.when, now])
 
+  // Reset only fires when the user has actively changed something away
+  // from the defaults — `when` defaults to upcoming, so flipping to
+  // "Отминали" counts as an active filter even though there's no
+  // longer an "all" mode.
   const hasAnyFilter =
-    current.type !== 'all' || current.when !== 'all'
+    current.type !== DEFAULT_FILTERS.type || current.when !== DEFAULT_FILTERS.when
 
   // The category list is collapsed by default — only expanded when the
   // viewer clicks the chevron, OR when a non-default category filter is
