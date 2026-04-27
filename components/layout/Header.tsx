@@ -8,33 +8,6 @@ import { Logo } from '@/components/brand/Logo'
 import { locales } from '@/lib/i18n/config'
 import clsx from 'clsx'
 
-function InstagramIcon({ className = 'h-[18px] w-[18px]' }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="0.9" fill="currentColor" stroke="none" />
-    </svg>
-  )
-}
-
-function FacebookIcon({ className = 'h-[18px] w-[18px]' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
-      <path d="M13.5 21.95V13.5h2.83l.42-3.3h-3.25V8.1c0-.95.27-1.6 1.63-1.6h1.74V3.57a23.4 23.4 0 0 0-2.54-.13c-2.52 0-4.25 1.54-4.25 4.37v2.4H7.25v3.3h2.83v8.45z" />
-    </svg>
-  )
-}
-
 function CartIcon({ className = 'h-[18px] w-[18px]' }: { className?: string }) {
   return (
     <svg
@@ -70,9 +43,6 @@ function ChevronDown({ className = 'h-3 w-3' }: { className?: string }) {
     </svg>
   )
 }
-
-const IG_HREF = 'https://www.instagram.com/a1.motor.park/'
-const FB_HREF = 'https://www.facebook.com/A1.Motor.Park/'
 
 type NavLink = {
   href: string
@@ -234,26 +204,6 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-1.5 md:gap-3">
-          {/* Desktop-only social icons sitting to the left of the EN/BG switch */}
-          <a
-            href={IG_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-            className="hidden lg:inline-flex items-center justify-center w-8 h-8 text-ink/60 hover:text-ink transition-colors"
-          >
-            <InstagramIcon className="h-[18px] w-[18px]" />
-          </a>
-          <a
-            href={FB_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Facebook"
-            className="hidden lg:inline-flex items-center justify-center w-8 h-8 text-ink/60 hover:text-ink transition-colors"
-          >
-            <FacebookIcon className="h-[18px] w-[18px]" />
-          </a>
-
           {/* Cart — visible at every breakpoint; links to the shop
               stub for now. When cart state ships this is where the
               item-count badge will live. */}
@@ -422,28 +372,6 @@ export function Header() {
             </Fragment>
           )
         })}
-        <div className="flex items-center justify-center gap-8 pt-8">
-          <a
-            href={IG_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-            onClick={() => setMenuOpen(false)}
-            className="inline-flex items-center justify-center w-11 h-11 text-ink/80 hover:text-ink transition-colors"
-          >
-            <InstagramIcon className="h-[24px] w-[24px]" />
-          </a>
-          <a
-            href={FB_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Facebook"
-            onClick={() => setMenuOpen(false)}
-            className="inline-flex items-center justify-center w-11 h-11 text-ink/80 hover:text-ink transition-colors"
-          >
-            <FacebookIcon className="h-[24px] w-[24px]" />
-          </a>
-        </div>
       </nav>
     </div>
     </>
