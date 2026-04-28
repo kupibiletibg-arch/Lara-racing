@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { TextSwap } from '@/components/common/TextSwap'
 
 const RECIPIENT = 'info@a1motorpark.com'
 
@@ -68,9 +69,10 @@ export function ContactForm() {
       <div className="mt-2 flex items-center gap-4">
         <button
           type="submit"
-          className="inline-flex items-center justify-center bg-brand hover:bg-brand-deep text-ink font-mono tracking-mono uppercase text-[11px] md:text-[12px] px-5 md:px-6 py-3 transition-colors"
+          className="btn-fill-sweep inline-flex items-center justify-center gap-2 bg-brand text-ink font-mono tracking-mono uppercase text-[11px] md:text-[12px] px-5 md:px-6 py-3"
         >
-          {t('formSubmit')} →
+          <TextSwap>{t('formSubmit')}</TextSwap>
+          <span aria-hidden className="btn-arrow">→</span>
         </button>
         {sent && (
           <p className="font-mono tracking-mono uppercase text-[10px] md:text-[11px] text-data">

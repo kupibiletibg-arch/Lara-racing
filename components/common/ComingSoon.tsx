@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getLocale, getTranslations } from 'next-intl/server'
+import { TextSwap } from '@/components/common/TextSwap'
 
 /**
  * Placeholder section used by every "coming soon" stub page. Matches
@@ -32,9 +33,10 @@ export async function ComingSoon({
       <div className="mt-10">
         <Link
           href={`/${locale}`}
-          className="inline-flex items-center gap-2 font-mono tracking-mono uppercase text-[11px] md:text-[12px] px-5 py-3 bg-brand text-ink hover:bg-brand-deep transition-colors"
+          className="btn-fill-sweep inline-flex items-center gap-2 font-mono tracking-mono uppercase text-[11px] md:text-[12px] px-5 py-3 bg-brand text-ink"
         >
-          ← {t('back')}
+          <span aria-hidden>←</span>
+          <TextSwap>{t('back')}</TextSwap>
         </Link>
       </div>
     </section>

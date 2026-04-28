@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { getLocale, getTranslations } from 'next-intl/server'
+import { TextSwap } from '@/components/common/TextSwap'
 
 type Category = {
   /** Query-string value for the calendar's `type` filter. */
@@ -73,9 +74,10 @@ export async function EventsHero() {
             </p>
             <Link
               href={`/${locale}/calendar`}
-              className="mt-6 md:mt-8 inline-flex items-center gap-2 bg-brand hover:bg-brand-deep text-ink px-5 md:px-6 py-3 font-mono tracking-mono uppercase text-[11px] md:text-[12px] transition-colors"
+              className="btn-fill-sweep mt-6 md:mt-8 inline-flex items-center gap-2 bg-brand text-ink px-5 md:px-6 py-3 font-mono tracking-mono uppercase text-[11px] md:text-[12px]"
             >
-              {t('cta')} →
+              <TextSwap>{t('cta')}</TextSwap>
+              <span aria-hidden className="btn-arrow">→</span>
             </Link>
           </div>
         </div>

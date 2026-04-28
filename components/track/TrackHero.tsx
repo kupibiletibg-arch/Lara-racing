@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { trackMeta } from '@/lib/data/track'
+import { TextSwap } from '@/components/common/TextSwap'
 
 /**
  * Home-page hero with the "A1 RACING TRACK" 3D visualiser on the left and
@@ -118,15 +119,17 @@ export function TrackHero() {
             <div className="mt-8 grid grid-cols-2 gap-2">
               <Link
                 href={`/${locale}/calendar`}
-                className="text-center font-mono tracking-mono uppercase text-[11px] px-4 py-3 bg-brand text-ink hover:bg-brand-deep transition-colors"
+                className="btn-fill-sweep inline-flex items-center justify-center gap-2 font-mono tracking-mono uppercase text-[11px] px-4 py-3 bg-brand text-ink"
               >
-                {t('ctaCalendar')}
+                <TextSwap>{t('ctaCalendar')}</TextSwap>
+                <span aria-hidden className="btn-arrow">→</span>
               </Link>
               <Link
                 href={`/${locale}/track`}
-                className="text-center font-mono tracking-mono uppercase text-[11px] px-4 py-3 border rule text-ink hover:bg-ink/5 transition-colors"
+                className="btn-fill-sweep btn-fill-sweep--outline inline-flex items-center justify-center gap-2 font-mono tracking-mono uppercase text-[11px] px-4 py-3 border rule text-ink"
               >
-                {t('ctaTrack')}
+                <TextSwap>{t('ctaTrack')}</TextSwap>
+                <span aria-hidden className="btn-arrow">→</span>
               </Link>
             </div>
           </aside>

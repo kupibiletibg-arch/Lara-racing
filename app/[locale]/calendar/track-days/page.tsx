@@ -4,6 +4,8 @@ import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { TrackDayCard } from '@/components/calendar/TrackDayCard'
 import { TrackDayInfo } from '@/components/calendar/TrackDayInfo'
 import { TrackDayExtras } from '@/components/calendar/TrackDayExtras'
+import { TextSwap } from '@/components/common/TextSwap'
+import { Reveal, RevealStagger, RevealItem } from '@/components/common/Reveal'
 
 export default async function TrackDaysPage({
   params,
@@ -39,61 +41,73 @@ export default async function TrackDaysPage({
 
       <section className="relative mx-auto max-w-[1200px] px-5 md:px-8 py-12 md:py-20">
         {/* Header */}
-        <p className="telemetry mb-3">{t('kicker')}</p>
-        <h1 className="font-display font-bold uppercase text-[44px] md:text-[64px] leading-[0.95] tracking-tight">
-          {t('title')}
-        </h1>
-        <p className="mt-4 md:mt-5 text-ink/80 text-[15px] md:text-[17px] leading-relaxed max-w-2xl">
-          {t('intro')}
-        </p>
+        <Reveal>
+          <p className="telemetry mb-3">{t('kicker')}</p>
+          <h1 className="font-display font-bold uppercase text-[44px] md:text-[64px] leading-[0.95] tracking-tight">
+            {t('title')}
+          </h1>
+          <p className="mt-4 md:mt-5 text-ink/80 text-[15px] md:text-[17px] leading-relaxed max-w-2xl">
+            {t('intro')}
+          </p>
 
-        {/* Secondary CTA — sends the visitor to the full season
-            catalog so they can see how the open-track-day formats sit
-            inside the rest of the calendar. Outlined treatment so it
-            doesn't compete with the brand-red voucher CTA on the
-            cards below. */}
-        <div className="mt-6 md:mt-8">
-          <Link
-            href={`/${locale}/calendar`}
-            className="inline-flex items-center gap-2 border rule px-5 md:px-6 py-3 font-mono tracking-mono uppercase text-[11px] md:text-[12px] text-ink/85 hover:text-ink hover:bg-ink/5 transition-colors"
-          >
-            {t('viewCalendar')} →
-          </Link>
-        </div>
+          {/* Secondary CTA — sends the visitor to the full season
+              catalog so they can see how the open-track-day formats sit
+              inside the rest of the calendar. Outlined treatment so it
+              doesn't compete with the brand-red voucher CTA on the
+              cards below. */}
+          <div className="mt-6 md:mt-8">
+            <Link
+              href={`/${locale}/calendar`}
+              className="btn-fill-sweep btn-fill-sweep--outline inline-flex items-center gap-2 border rule px-5 md:px-6 py-3 font-mono tracking-mono uppercase text-[11px] md:text-[12px] text-ink/85"
+            >
+              <TextSwap>{t('viewCalendar')}</TextSwap>
+              <span aria-hidden className="btn-arrow">→</span>
+            </Link>
+          </div>
+        </Reveal>
 
-        {/* Two product cards (Auto + Moto) + booking contact strip. */}
-        <div className="mt-10 md:mt-14 grid lg:grid-cols-2 gap-6 md:gap-8">
-          <TrackDayCard slug="auto" />
-          <TrackDayCard slug="moto" />
-        </div>
+        {/* Two product cards (Auto + Moto) staggered. */}
+        <RevealStagger
+          className="mt-10 md:mt-14 grid lg:grid-cols-2 gap-6 md:gap-8"
+          staggerGap={0.12}
+        >
+          <RevealItem>
+            <TrackDayCard slug="auto" />
+          </RevealItem>
+          <RevealItem>
+            <TrackDayCard slug="moto" />
+          </RevealItem>
+        </RevealStagger>
 
-        <div className="mt-6 md:mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-ink/65 text-[13px] md:text-[14px]">
-          <span className="font-mono tracking-mono uppercase text-[10px] md:text-[11px] text-ink/55">
-            {t('contact.label')}
-          </span>
-          <a
-            href={`tel:${t('contact.phone').replace(/\s+/g, '')}`}
-            className="font-mono tracking-mono hover:text-brand transition-colors"
-          >
-            {t('contact.phone')}
-          </a>
-          <a
-            href={`mailto:${t('contact.email')}`}
-            className="font-mono tracking-mono hover:text-brand transition-colors"
-          >
-            {t('contact.email')}
-          </a>
-        </div>
+        <Reveal>
+          <div className="mt-6 md:mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-ink/65 text-[13px] md:text-[14px]">
+            <span className="font-mono tracking-mono uppercase text-[10px] md:text-[11px] text-ink/55">
+              {t('contact.label')}
+            </span>
+            <a
+              href={`tel:${t('contact.phone').replace(/\s+/g, '')}`}
+              className="font-mono tracking-mono hover:text-brand transition-colors"
+            >
+              {t('contact.phone')}
+            </a>
+            <a
+              href={`mailto:${t('contact.email')}`}
+              className="font-mono tracking-mono hover:text-brand transition-colors"
+            >
+              {t('contact.email')}
+            </a>
+          </div>
+        </Reveal>
 
         {/* Important / Included two-column block */}
-        <div className="mt-16 md:mt-24 border-t rule pt-12 md:pt-16">
+        <Reveal className="mt-16 md:mt-24 border-t rule pt-12 md:pt-16">
           <TrackDayInfo />
-        </div>
+        </Reveal>
 
         {/* Add-on tariff grid */}
-        <div className="mt-16 md:mt-24 border-t rule pt-12 md:pt-16">
+        <Reveal className="mt-16 md:mt-24 border-t rule pt-12 md:pt-16">
           <TrackDayExtras />
-        </div>
+        </Reveal>
       </section>
     </>
   )
