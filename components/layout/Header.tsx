@@ -204,7 +204,7 @@ export function Header() {
                 key={l.href}
                 href={l.href}
                 className={clsx(
-                  'text-swap-trigger px-3 py-2 transition-colors relative',
+                  'text-swap-trigger px-3 py-2 transition-colors relative inline-flex items-center',
                   active ? 'text-brand' : 'text-ink/70 hover:text-ink',
                 )}
               >
