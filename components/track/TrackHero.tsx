@@ -87,11 +87,6 @@ export function TrackHero() {
              * narrow portrait viewport would otherwise force.
              */}
             <div className="relative aspect-[5/4] md:aspect-auto md:flex-1 md:min-h-0 overflow-hidden select-none">
-              <Crosshair className="top-0 left-0" />
-              <Crosshair className="top-0 right-0 rotate-90" />
-              <Crosshair className="bottom-0 left-0 -rotate-90" />
-              <Crosshair className="bottom-0 right-0 rotate-180" />
-
               {mountIframe ? (
                 <iframe
                   src="/a1-track/index.html"
@@ -149,15 +144,3 @@ export function TrackHero() {
   )
 }
 
-function Crosshair({ className }: { className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={`absolute ${className} pointer-events-none z-[1]`}
-      style={{ width: 18, height: 18 }}
-    >
-      <span className="absolute left-0 top-0 w-[18px] h-px bg-ink/20" />
-      <span className="absolute left-0 top-0 w-px h-[18px] bg-ink/20" />
-    </span>
-  )
-}
