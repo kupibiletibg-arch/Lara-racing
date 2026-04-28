@@ -154,9 +154,16 @@ export function Header() {
                   >
                     {l.label}
                     <ChevronDown className="h-3 w-3 opacity-70 transition-transform group-hover:rotate-180" />
-                    {active && (
-                      <span className="absolute left-3 right-3 bottom-1 h-px bg-brand" />
-                    )}
+                    {/* Underline always renders so the scale-x grows
+                        in / out smoothly on route change instead of
+                        popping in. */}
+                    <span
+                      aria-hidden
+                      className={clsx(
+                        'absolute left-3 right-3 bottom-1 h-px bg-brand origin-left transition-transform duration-300 ease-out',
+                        active ? 'scale-x-100' : 'scale-x-0',
+                      )}
+                    />
                   </Link>
 
                   {/* Dropdown panel. `pt-2` on the wrapper bridges the
@@ -201,9 +208,13 @@ export function Header() {
                 )}
               >
                 {l.label}
-                {active && (
-                  <span className="absolute left-3 right-3 bottom-1 h-px bg-brand" />
-                )}
+                <span
+                  aria-hidden
+                  className={clsx(
+                    'absolute left-3 right-3 bottom-1 h-px bg-brand origin-left transition-transform duration-300 ease-out',
+                    active ? 'scale-x-100' : 'scale-x-0',
+                  )}
+                />
               </Link>
             )
           })}

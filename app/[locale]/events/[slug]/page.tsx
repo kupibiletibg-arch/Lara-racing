@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { races } from '@/lib/data/races'
 import { SessionTimes } from '@/components/calendar/SessionTimes'
+import { Reveal } from '@/components/common/Reveal'
 
 export function generateStaticParams() {
   return races.flatMap(r => [
@@ -33,35 +34,37 @@ export default async function EventPage({
         ← {t('title')}
       </Link>
 
-      <div className="mt-6 flex items-baseline gap-3">
-        <span className="font-mono tracking-mono text-[13px] font-bold text-brand">
-          R{race.id}
-        </span>
-        <span className="font-mono tracking-mono uppercase text-[10px] text-ink/50">
-          {teT(race.type)}
-        </span>
-      </div>
+      <Reveal>
+        <div className="mt-6 flex items-baseline gap-3">
+          <span className="font-mono tracking-mono text-[13px] font-bold text-brand">
+            R{race.id}
+          </span>
+          <span className="font-mono tracking-mono uppercase text-[10px] text-ink/50">
+            {teT(race.type)}
+          </span>
+        </div>
 
-      <h1 className="mt-3 font-display font-bold text-[36px] md:text-[52px] leading-[1] tracking-tight">
-        {te(race.nameKey)}
-      </h1>
+        <h1 className="mt-3 font-display font-bold text-[36px] md:text-[52px] leading-[1] tracking-tight">
+          {te(race.nameKey)}
+        </h1>
 
-      <p className="mt-4 font-mono tracking-mono text-[13px] text-ink/70">
-        {race.dateLabel}
-        {race.dateTBD && <span className="ml-2 text-data/80">· {t('statusTBD')}</span>}
-      </p>
+        <p className="mt-4 font-mono tracking-mono text-[13px] text-ink/70">
+          {race.dateLabel}
+          {race.dateTBD && <span className="ml-2 text-data/80">· {t('statusTBD')}</span>}
+        </p>
+      </Reveal>
 
       {race.sessions && (
-        <div className="mt-10 border-t rule pt-6 max-w-md">
+        <Reveal className="mt-10 border-t rule pt-6 max-w-md">
           <p className="telemetry mb-3">{t('sessionsLabel')}</p>
           <SessionTimes sessions={race.sessions} />
-        </div>
+        </Reveal>
       )}
 
-      <div className="mt-10">
+      <Reveal className="mt-10">
         <p className="telemetry mb-3">{t('tickets')}</p>
         <p className="text-ink/60">—</p>
-      </div>
+      </Reveal>
     </section>
   )
 }
