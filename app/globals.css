@@ -137,6 +137,14 @@ body {
 .btn-fill-sweep:hover::before,
 .btn-fill-sweep:focus-visible::before { transform: translateX(0); }
 
+/* Filled brand variant: no colour sweep — the red buttons stay their
+   resting brand red on hover, only the per-character text rewrite
+   plays. We disable the ::before pseudo entirely so there is nothing
+   to translate or paint. */
+.btn-fill-sweep:not(.btn-fill-sweep--outline)::before {
+  content: none;
+}
+
 /* Outlined variant: rest is transparent with a hairline; on hover the
    background sweeps to brand-red and the border colour matches. */
 .btn-fill-sweep.btn-fill-sweep--outline::before {
