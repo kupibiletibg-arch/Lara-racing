@@ -1,5 +1,6 @@
 import Image from 'next/image'
-import { useTranslations } from 'next-intl'
+import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 import { Logo } from '@/components/brand/Logo'
 import { PartnersMarquee } from '@/components/partners/PartnersMarquee'
 
@@ -35,6 +36,7 @@ function FacebookIcon({ className = 'h-[20px] w-[20px]' }: { className?: string 
 
 export function Footer() {
   const t = useTranslations('footer')
+  const locale = useLocale()
 
   return (
     <footer className="relative mt-32 border-t rule">
@@ -78,6 +80,12 @@ export function Footer() {
               <FacebookIcon className="h-[20px] w-[20px]" />
             </a>
           </div>
+          <Link
+            href={`/${locale}/privacy`}
+            className="font-mono tracking-mono uppercase text-[10px] text-ink/45 hover:text-ink/80 transition-colors"
+          >
+            {t('privacy')}
+          </Link>
         </div>
 
         <a
@@ -138,6 +146,12 @@ export function Footer() {
             <FacebookIcon className="h-[22px] w-[22px]" />
           </a>
         </div>
+        <Link
+          href={`/${locale}/privacy`}
+          className="font-mono tracking-mono uppercase text-[10px] text-ink/45 hover:text-ink/80 transition-colors"
+        >
+          {t('privacy')}
+        </Link>
       </div>
 
       <div className="border-t rule">
