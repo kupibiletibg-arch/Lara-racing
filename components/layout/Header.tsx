@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import { Logo } from '@/components/brand/Logo'
+import { TextSwap } from '@/components/common/TextSwap'
 import { locales } from '@/lib/i18n/config'
 import clsx from 'clsx'
 
@@ -147,12 +148,12 @@ export function Header() {
                   <Link
                     href={l.href}
                     className={clsx(
-                      'px-3 py-2 transition-colors relative inline-flex items-center gap-1.5',
+                      'text-swap-trigger px-3 py-2 transition-colors relative inline-flex items-center gap-1.5',
                       active ? 'text-brand' : 'text-ink/70 hover:text-ink',
                     )}
                     aria-haspopup="true"
                   >
-                    {l.label}
+                    <TextSwap>{l.label}</TextSwap>
                     <ChevronDown className="h-3 w-3 opacity-70 transition-transform group-hover:rotate-180" />
                     {/* Underline always renders so the scale-x grows
                         in / out smoothly on route change instead of
@@ -203,11 +204,11 @@ export function Header() {
                 key={l.href}
                 href={l.href}
                 className={clsx(
-                  'px-3 py-2 transition-colors relative',
+                  'text-swap-trigger px-3 py-2 transition-colors relative',
                   active ? 'text-brand' : 'text-ink/70 hover:text-ink',
                 )}
               >
-                {l.label}
+                <TextSwap>{l.label}</TextSwap>
                 <span
                   aria-hidden
                   className={clsx(

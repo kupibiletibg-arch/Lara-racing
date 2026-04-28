@@ -1,16 +1,19 @@
 /**
  * <TextSwap> — Lando-style per-character text rewrite on hover.
  *
- * Stacks two copies of every glyph vertically inside an
- * overflow-hidden char wrapper. When any ancestor with
- * `.btn-fill-sweep` is hovered (or focus-visible), each char
- * translates -100 %, so the original glyph slides up and the
- * duplicate underneath rolls into its place. A small per-character
- * delay (25 ms × index) types the new word left-to-right instead of
- * swapping the whole row at once.
+ * Each character lives inside a fixed-height "char window"
+ * (`.text-swap-char`, `overflow: hidden`, height `1em`). Inside the
+ * window, a `.text-swap-stack` wrapper holds two copies of the glyph
+ * stacked vertically — first one in the visible slot, second one
+ * directly below it (clipped by the window). On hover of any
+ * ancestor `.btn-fill-sweep`, the stack translates -100 %, so the
+ * top glyph rolls up and the duplicate rolls into its place. Per-
+ * character `transition-delay: var(--swap-delay)` (25 ms × index)
+ * types the swap left-to-right instead of swapping the whole word
+ * at once.
  *
- * No client-side JS needed — the entire effect is CSS in
- * `app/globals.css` (`.text-swap*`). This file just emits the markup.
+ * No client JS — the whole effect lives in `app/globals.css`
+ * (`.text-swap*`). This file just emits the markup.
  */
 export function TextSwap({ children }: { children: string }) {
   // Split into individual glyph cells. Spaces become non-breaking
@@ -26,10 +29,14 @@ export function TextSwap({ children }: { children: string }) {
             key={`${c}-${i}`}
             className="text-swap-char"
             aria-hidden
-            style={{ ['--swap-delay' as string]: `${i * 25}ms` }}
           >
-            <span className="text-swap-glyph">{glyph}</span>
-            <span className="text-swap-glyph">{glyph}</span>
+            <span
+              className="text-swap-stack"
+              style={{ ['--swap-delay' as string]: `${i * 25}ms` }}
+            >
+              <span className="text-swap-glyph">{glyph}</span>
+              <span className="text-swap-glyph">{glyph}</span>
+            </span>
           </span>
         )
       })}
