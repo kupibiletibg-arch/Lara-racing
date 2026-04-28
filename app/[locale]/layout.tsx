@@ -10,6 +10,7 @@ import { Footer } from '@/components/layout/Footer'
 import { GrainOverlay } from '@/components/layout/GrainOverlay'
 import { TopoBackground } from '@/components/layout/TopoBackground'
 import { RoutePrefetcher } from '@/components/layout/RoutePrefetcher'
+import { CookieBanner } from '@/components/common/CookieBanner'
 import IntroSequence from '@/components/IntroSequence'
 import '../globals.css'
 
@@ -79,6 +80,7 @@ export default async function LocaleLayout({
             </main>
             <Footer />
           </div>
+          <CookieBanner />
         </NextIntlClientProvider>
       </body>
     </html>

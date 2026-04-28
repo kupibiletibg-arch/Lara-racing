@@ -218,5 +218,12 @@
       "boxWeekendLabel": "Pit box (Sat-Sun)",
       "boxWeekendPrice": "€160"
     }
+  },
+  "cookies": {
+    "kicker": "COOKIES",
+    "title": "This site uses cookies",
+    "body": "We use cookies to improve site functionality and analyse traffic anonymously. You can accept all of them, or just the ones essential for the site to work.",
+    "acceptAll": "Accept all",
+    "essential": "Essential only"
   }
 }
