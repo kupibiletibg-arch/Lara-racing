@@ -62,7 +62,7 @@ export function TrackHero() {
       <div className="md:sticky md:top-24 md:h-[calc(100vh-7rem)]">
         <div className="mx-auto max-w-[1400px] w-full md:h-full px-5 md:px-8 pb-6 md:pb-10 pt-5 md:pt-8 flex flex-col md:grid md:grid-cols-[1fr_280px] gap-8 md:gap-6 lg:gap-8 md:items-stretch">
           {/* LEFT — 3D stage */}
-          <div className="relative flex flex-col min-h-[62vh] md:min-h-0">
+          <div className="relative flex flex-col md:min-h-0">
             <div className="flex items-baseline justify-between gap-4 mb-3 md:mb-4">
               <p className="telemetry">{t('kicker')}</p>
               <p className="telemetry hidden md:block">
@@ -75,8 +75,18 @@ export function TrackHero() {
              * horizontal drags are captured inside the viz for the
              * manual 360° rotation. Pinch-zoom is disabled via the viz's
              * own <meta viewport> (user-scalable=no).
+             *
+             * On mobile we lock the canvas to a 5:4 (≈1.25) landscape
+             * aspect ratio. The Three.js scene inside derives its
+             * camera distance from the canvas aspect — at 5:4 the
+             * portrait-pullback (`DESIGN_ASPECT / aspect` ≈ 1.20) drops
+             * back below the rotation-safety floor of 1.22, matching
+             * desktop's framing. Net effect: the track on phones is
+             * rendered at the same close framing as the desktop hero
+             * instead of being shrunk by a 2× pullback that the
+             * narrow portrait viewport would otherwise force.
              */}
-            <div className="relative flex-1 min-h-0 overflow-hidden select-none">
+            <div className="relative aspect-[5/4] md:aspect-auto md:flex-1 md:min-h-0 overflow-hidden select-none">
               <Crosshair className="top-0 left-0" />
               <Crosshair className="top-0 right-0 rotate-90" />
               <Crosshair className="bottom-0 left-0 -rotate-90" />
