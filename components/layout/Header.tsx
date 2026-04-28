@@ -148,13 +148,13 @@ export function Header() {
                   <Link
                     href={l.href}
                     className={clsx(
-                      'text-swap-trigger px-3 py-2 transition-colors relative inline-flex items-center gap-1.5',
+                      'text-swap-trigger px-3 py-2 transition-colors relative',
                       active ? 'text-brand' : 'text-ink/70 hover:text-ink',
                     )}
                     aria-haspopup="true"
                   >
                     <TextSwap>{l.label}</TextSwap>
-                    <ChevronDown className="h-3 w-3 opacity-70 transition-transform group-hover:rotate-180" />
+                    <ChevronDown className="h-3 w-3 ml-1.5 inline-block align-bottom opacity-70 transition-transform group-hover:rotate-180" />
                     {/* Underline always renders so the scale-x grows
                         in / out smoothly on route change instead of
                         popping in. */}
@@ -204,7 +204,7 @@ export function Header() {
                 key={l.href}
                 href={l.href}
                 className={clsx(
-                  'text-swap-trigger px-3 py-2 transition-colors relative inline-flex items-center',
+                  'text-swap-trigger px-3 py-2 transition-colors relative',
                   active ? 'text-brand' : 'text-ink/70 hover:text-ink',
                 )}
               >
