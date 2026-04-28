@@ -99,6 +99,103 @@ body {
   to   { opacity: 1; transform: none; }
 }
 
+/* ------------------------------------------------------------------
+ * Lando-style fill-sweep CTA
+ *
+ * `.btn-fill-sweep` adds a left→right brand-deep colour wipe + 1 px
+ * lift on hover. Two variants:
+ *
+ *   .btn-fill-sweep                    → filled brand → wipes to brand-deep
+ *   .btn-fill-sweep.btn-fill-sweep--outline
+ *                                       → outlined → wipes to filled brand
+ *
+ * No JS. Pure CSS, GPU-composited. Reduced-motion already zeroes
+ * every transition globally (see media query below) so this auto-
+ * downgrades to a no-op for that audience.
+ * ------------------------------------------------------------------ */
+.btn-fill-sweep {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    color 360ms cubic-bezier(0.65, 0, 0.3, 1),
+    transform 360ms cubic-bezier(0.65, 0, 0.3, 1),
+    border-color 360ms cubic-bezier(0.65, 0, 0.3, 1);
+}
+.btn-fill-sweep::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--brand-deep);
+  transform: translateX(-101%);
+  transition: transform 480ms cubic-bezier(0.65, 0, 0.3, 1);
+  z-index: -1;
+  will-change: transform;
+}
+.btn-fill-sweep:hover,
+.btn-fill-sweep:focus-visible { transform: translateY(-1px); }
+.btn-fill-sweep:hover::before,
+.btn-fill-sweep:focus-visible::before { transform: translateX(0); }
+
+/* Outlined variant: rest is transparent with a hairline; on hover the
+   background sweeps to brand-red and the border colour matches. */
+.btn-fill-sweep.btn-fill-sweep--outline::before {
+  background: var(--brand);
+}
+.btn-fill-sweep.btn-fill-sweep--outline:hover,
+.btn-fill-sweep.btn-fill-sweep--outline:focus-visible {
+  color: var(--ink);
+  border-color: var(--brand);
+}
+
+/* Optional arrow glyph — translates 4 px right on hover. Wrap any
+   trailing arrow in `<span class="btn-arrow">→</span>`. */
+.btn-fill-sweep .btn-arrow {
+  display: inline-block;
+  transition: transform 360ms cubic-bezier(0.65, 0, 0.3, 1);
+}
+.btn-fill-sweep:hover .btn-arrow,
+.btn-fill-sweep:focus-visible .btn-arrow {
+  transform: translateX(4px);
+}
+
+/* ------------------------------------------------------------------
+ * <TextSwap> — Lando-style per-character text rewrite on hover
+ *
+ * Container has overflow:hidden + line-height:1 + height:1em so the
+ * second copy of each glyph sits one line below, hidden until the
+ * char wrapper translates -100%. Each char carries an inline
+ * `transition-delay` from JS (i * 25 ms) so the swap "types" left
+ * to right instead of all at once.
+ *
+ * Triggered by hovering ANY ancestor with `.btn-fill-sweep` so the
+ * swap stays in sync with the colour wipe + arrow nudge already
+ * happening on the same button.
+ * ------------------------------------------------------------------ */
+.text-swap {
+  display: inline-flex;
+  vertical-align: bottom;
+  overflow: hidden;
+  line-height: 1;
+}
+.text-swap-char {
+  display: inline-block;
+  overflow: hidden;
+  height: 1em;
+  transition: transform 420ms cubic-bezier(0.65, 0, 0.35, 1);
+  transition-delay: var(--swap-delay, 0ms);
+  will-change: transform;
+}
+.text-swap-glyph {
+  display: block;
+  height: 1em;
+  line-height: 1;
+}
+.btn-fill-sweep:hover .text-swap-char,
+.btn-fill-sweep:focus-visible .text-swap-char {
+  transform: translateY(-100%);
+}
+
 /* Topographic contour background — concentric faint rings. */
 .topo-bg {
   position: fixed;
