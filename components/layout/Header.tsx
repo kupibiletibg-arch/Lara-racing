@@ -83,8 +83,8 @@ export function Header() {
       href: `/${locale}/experiences`,
       label: t('experiences'),
       children: [
-        { href: `/${locale}/experiences/hot-laps`, label: t('experiencesHotLaps') },
         { href: `/${locale}/experiences/academy`, label: t('experiencesAcademy') },
+        { href: `/${locale}/experiences/hot-laps`, label: t('experiencesHotLaps') },
         { href: `/${locale}/experiences/vr-racing`, label: t('experiencesVrRacing') },
       ],
     },
