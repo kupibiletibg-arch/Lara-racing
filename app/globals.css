@@ -209,7 +209,7 @@ body {
 .btn-fill-sweep:focus-visible .text-swap-stack,
 .text-swap-trigger:hover .text-swap-stack,
 .text-swap-trigger:focus-visible .text-swap-stack {
-  transform: translateY(-100%);
+  transform: translateY(-50%);
 }
 
 /* Topographic contour background — concentric faint rings. */
